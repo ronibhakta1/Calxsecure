@@ -2,10 +2,6 @@
 
 **[View Live Demo »](https://calxsecure.ronibhakta.in/)**
 
-[![License](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg)](https://opensource.org/licenses/BSD-3-Clause)
-[![Build Status](https://img.shields.io/badge/build-passing-brightgreen.svg)](https://github.com/ronibhakta/calxsecure)
-[![Stars](https://img.shields.io/github/stars/ronibhakta/calxsecure.svg)](https://github.com/ronibhakta/calxsecure/stargazers)
-[![Forks](https://img.shields.io/github/forks/ronibhakta/calxsecure.svg)](https://github.com/ronibhakta/calxsecure/network/members)
 
 A secure, full-stack web application designed to simulate an end-to-end payment and wallet system. Built with a focus on security, performance, and a clean user experience.
 
