@@ -7,8 +7,10 @@ export const authOptions = {
       CredentialsProvider({
           name: 'Credentials',
           credentials: {
+            name:{label:"Name", type: "text", placeholder: "Nasir nadaf", required: false},
             phone: { label: "Phone number", type: "text", placeholder: "1234567890", required: true },
-            password: { label: "Password", type: "password", required: true }
+            password: { label: "Password", type: "password", required: true },
+            
           },
           // TODO: User credentials type from next-aut
           async authorize(credentials: any) {
@@ -61,6 +63,9 @@ export const authOptions = {
 
             return session
         }
-    }
+    },
+    pages: {
+        signIn: '/auth/signin',
+        signUp: '/auth/signup', // Optional, if you want a separate sign-up page
+    },
   }
-  
