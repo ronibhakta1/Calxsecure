@@ -1,3 +1,6 @@
+"use client";
+import { signIn, signOut, useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { Bell, CreditCard, Home, LogOut, Send, Settings, User, Wallet } from 'lucide-react';
 import {
   Avatar,
@@ -21,7 +24,7 @@ function SidebarItem({
   return (
     <Button
       variant="ghost"
-      className="w-full justify-start px-4 py-2 text-left"
+      className="w-full justify-start px-4 py-2 text-left hover:bg-zinc-600 text-zinc-100"
       asChild
     >
       <a href={href}>
@@ -50,11 +53,25 @@ export default function Layout({
 }: {
   children: React.ReactNode;
 }): JSX.Element {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      console.log("Attempting to sign out...");
+      await signOut({ redirect: false }); // Prevent default redirect
+      console.log("Sign out successful, redirecting to /signup");
+      router.push("/signup"); // Redirect to signup page
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
+
   return (
     <TooltipProvider>
-      <div className="flex min-h-screen bg-gray-100">
+      <div className="flex bg-zinc-800 text-zinc-100">
         {/* Sidebar */}
-        <aside className="w-72 bg-white border-r border-slate-200 flex flex-col">
+        <aside className="w-72 border-r border-slate-200 flex flex-col">
           <nav className="mt-6 flex-1">
             <SidebarItem href="/dashboard" icon={<HomeIcon />} title="Home" />
             <SidebarItem href="/transfer" icon={<TransferIcon />} title="Transfer" />
@@ -66,28 +83,49 @@ export default function Layout({
             <Separator className="mb-4" />
             <div className="flex items-center">
               <Avatar>
-                <AvatarImage src="https://github.com/shadcn.png" alt="@user" />
-                <AvatarFallback>US</AvatarFallback>
+                <AvatarImage src={session?.user?.image || "https://github.com/shadcn.png"} alt="@user" />
+                <AvatarFallback>{session?.user?.name?.[0] || "US"}</AvatarFallback>
               </Avatar>
               <div className="ml-3">
-                <p className="text-sm font-medium">Nasir Nadaf</p>
-                <p className="text-xs text-muted-foreground">nasir@gmail.com</p>
+                <p className="text-sm font-medium">{session?.user?.name || "Nasir Nadaf"}</p>
+                <p className="text-xs text-muted-foreground">{session?.user?.email || "nasir@gmail.com"}</p>
               </div>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" className="ml-auto" size="icon">
-                    <LogOut className="h-4 w-4" />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>Log Out</TooltipContent>
-              </Tooltip>
+              {status === "authenticated" && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="ml-auto"
+                      size="icon"
+                      onClick={handleLogout}
+                    >
+                      <LogOut className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Log Out</TooltipContent>
+                </Tooltip>
+              )}
+              {status === "unauthenticated" && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      className="ml-auto"
+                      size="icon"
+                      onClick={() => signIn()}
+                    >
+                      <User className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>Sign In</TooltipContent>
+                </Tooltip>
+              )}
             </div>
           </div>
         </aside>
         {/* Main Content */}
-        <div className="flex-1 flex flex-col min-h-screen">
-          
-          <main className="flex-1 overflow-y-auto">
+        <div className="flex-1 flex flex-col">
+          <main className="flex-1 overflow-y-auto  ">
             {children}
           </main>
         </div>

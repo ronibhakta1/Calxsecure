@@ -14,7 +14,7 @@ export const Appbar = ({
     onSignin,
     onSignout
 }: AppbarProps) => {
-    return <div className="flex justify-between  px-4">
+    return <div className="flex  justify-between  px-4">
         <div className="text-lg flex flex-col justify-center">
             CalxSecure
         </div>

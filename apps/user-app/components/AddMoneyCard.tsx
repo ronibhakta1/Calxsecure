@@ -1,42 +1,73 @@
-"use client"
-import { Button } from "@repo/ui/button";
-import { Card } from "@repo/ui/card";
-import { Center } from "@repo/ui/center";
-import { Select } from "@repo/ui/select";
+"use client";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
-import { TextInput } from "@repo/ui/textinput";
+import { createOnrampTransaction } from "@/app/lib/actions/createOnramptxn";
 
-const SUPPORTED_BANKS = [{
-    name: "HDFC Bank",
-    redirectUrl: "https://netbanking.hdfcbank.com"
-}, {
-    name: "Axis Bank",
-    redirectUrl: "https://www.axisbank.com/"
-}];
+const SUPPORTED_BANKS = [
+    { name: "HDFC Bank", redirectUrl: "https://netbanking.hdfcbank.com" },
+    { name: "Axis Bank", redirectUrl: "https://www.axisbank.com/" },
+];
 
 export const AddMoney = () => {
     const [redirectUrl, setRedirectUrl] = useState(SUPPORTED_BANKS[0]?.redirectUrl);
-    return <Card title="Add Money">
-    <div className="w-full">
-        <TextInput label={"Amount"} placeholder={"Amount"} onChange={() => {
+    const [amount, setAmount] = useState(0);
+    const [provider, setProvider] = useState(SUPPORTED_BANKS[0]?.name || "");
 
-        }} />
-        <div className="py-4 text-left">
-            Bank
-        </div>
-        <Select onSelect={(value) => {
-            setRedirectUrl(SUPPORTED_BANKS.find(x => x.name === value)?.redirectUrl || "")
-        }} options={SUPPORTED_BANKS.map(x => ({
-            key: x.name,
-            value: x.name
-        }))} />
-        <div className="flex justify-center pt-4">
-            <Button onClick={() => {
-                window.location.href = redirectUrl || "";
-            }}>
-            Add Money
-            </Button>
-        </div>
-    </div>
-</Card>
-}
+    return (
+        <Card className="border bg-zinc-800 shadow-sm">
+            <CardHeader>
+                <CardTitle className="text-xl text-zinc-100">Add Money</CardTitle>
+                <CardDescription className="text-zinc-50">
+                    Add funds to your account securely
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-zinc-50">Amount</label>
+                    <Input
+                        type="number"
+                        placeholder="Enter amount"
+                        className="border-zinc-800 bg-zinc-700  text-zinc-100 outline-none "
+                        onChange={(e) => setAmount(Number(e.target.value))}
+                    />
+                </div>
+                <div className="space-y-2">
+                    <label className="text-sm font-medium text-zinc-50">Select Bank</label>
+                    <Select
+                        onValueChange={(value) => {
+                            const bank = SUPPORTED_BANKS.find((x) => x.name === value);
+                            setRedirectUrl(bank?.redirectUrl || "");
+                            setProvider(bank?.name || "");
+                        }}
+                        defaultValue={SUPPORTED_BANKS[0]?.name}
+                    >
+                        <SelectTrigger className="border-zinc-100 bg-zinc-700 text-zinc-100 outline-none">
+                            <SelectValue placeholder="Select a bank" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            {SUPPORTED_BANKS.map((bank) => (
+                                <SelectItem key={bank.name} value={bank.name}>
+                                    {bank.name}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                </div>
+            </CardContent>
+            <CardFooter>
+                <Button
+                    className="w-full bg-zinc-700 hover:bg-zinc-700 text-white"
+                    onClick={async () => {
+                        await createOnrampTransaction(amount, provider);
+                        window.location.href = redirectUrl || "";
+                    }}
+                >
+                    Add Money
+                </Button>
+            </CardFooter>
+        </Card>
+    );
+};

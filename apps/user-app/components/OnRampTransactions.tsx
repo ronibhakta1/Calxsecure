@@ -1,39 +1,34 @@
-import { Card } from "@repo/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export const OnRampTransactions = ({
-    transactions
+    transactions,
 }: {
-    transactions: {
-        time: Date,
-        amount: number,
-        // TODO: Can the type of `status` be more specific?
-        status: string,
-        provider: string
-    }[]
+    transactions: { time: Date; amount: number; status: string; provider: string }[];
 }) => {
-    if (!transactions.length) {
-        return <Card title="Recent Transactions">
-            <div className="text-center pb-8 pt-8">
-                No Recent transactions
-            </div>
+    return (
+        <Card className="border-zinc-200 bg-zinc-800 shadow-sm">
+            <CardHeader>
+                <CardTitle className="text-xl text-zinc-100">Recent Transactions</CardTitle>
+                <CardDescription className="text-zinc-300">Your latest transaction history</CardDescription>
+            </CardHeader>
+            <CardContent>
+                {transactions.length === 0 ? (
+                    <div className="text-center py-8 text-zinc-200">No recent transactions</div>
+                ) : (
+                    <div className="space-y-4">
+                        {transactions.map((t, index) => (
+                            <div key={index} className="flex justify-between items-center border-b border-zinc-200 pb-3 last:border-b-0">
+                                <div>
+                                    <div className="text-sm font-medium text-zinc-100">Received INR</div>
+                                    <div className="text-xs text-zinc-300">{t.time.toDateString()}</div>
+                                    <div className="text-xs text-zinc-300">via {t.provider} ({t.status})</div>
+                                </div>
+                                <div className="text-sm font-semibold text-green-600">+ Rs {(t.amount / 100).toFixed(2)}</div>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </CardContent>
         </Card>
-    }
-    return <Card title="Recent Transactions">
-        <div className="pt-2">
-            {transactions.map(t => <div className="flex justify-between">
-                <div>
-                    <div className="text-sm">
-                        Received INR
-                    </div>
-                    <div className="text-slate-600 text-xs">
-                        {t.time.toDateString()}
-                    </div>
-                </div>
-                <div className="flex flex-col justify-center">
-                    + Rs {t.amount / 100}
-                </div>
-
-            </div>)}
-        </div>
-    </Card>
-}
+    );
+};

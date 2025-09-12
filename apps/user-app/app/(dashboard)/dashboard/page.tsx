@@ -94,24 +94,24 @@ export default function PaymentDashboard() {
   return (
     <TooltipProvider>
       <ToastProvider>
-        <div className="p-6 space-y-6 max-w-[calc(100vw-18rem)] mx-auto">
+        <div className="p-6 space-y-6 max-w-[calc(100vw-18rem)] mx-auto ">
           {/* Balance Card */}
-          <Card>
+          <Card className='bg-zinc-700 text-zinc-100'>
             <CardHeader>
-              <CardTitle>Account Balance</CardTitle>
-              <CardDescription>Your current balance and quick actions.</CardDescription>
+              <CardTitle className='text-zinc-100'>Account Balance</CardTitle>
+              <CardDescription className='text-zinc-300'>Your current balance and quick actions.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-4xl font-bold">${mockBalance.toFixed(2)}</div>
+              <div className="text-4xl font-bold ">${mockBalance.toFixed(2)}</div>
             </CardContent>
             <CardFooter className="space-x-4">
               <Dialog>
-                <DialogTrigger asChild>
-                  <Button>
+                <DialogTrigger asChild className=' bg-zinc-500'>
+                  <Button className='bg-zinc-500 hover:bg-zinc-600' >
                     <DollarSign className="mr-2 h-4 w-4" /> Add Funds
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className='bg-zinc-800 text-zinc-100'>
                   <DialogHeader>
                     <DialogTitle>Add Funds</DialogTitle>
                     <DialogDescription>Enter the amount to add to your balance.</DialogDescription>
@@ -127,7 +127,7 @@ export default function PaymentDashboard() {
                         <SelectTrigger className="col-span-3">
                           <SelectValue placeholder="Select payment method" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className='bg-zinc-800 text-zinc-100'>
                           <SelectItem value="card">Credit Card</SelectItem>
                           <SelectItem value="bank">Bank Transfer</SelectItem>
                           <SelectItem value="paypal">PayPal</SelectItem>
@@ -136,17 +136,17 @@ export default function PaymentDashboard() {
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button type="submit">Confirm</Button>
+                    <Button type="submit" className='bg-zinc-700 hover:bg-zinc-600 '>Confirm</Button>
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button variant="outline">
+                  <Button className='bg-zinc-500 hover:bg-zinc-600 '>
                     <Send className="mr-2 h-4 w-4" /> Send Money
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className='bg-zinc-800 text-zinc-100'>
                   <DialogHeader>
                     <DialogTitle>Send Money</DialogTitle>
                     <DialogDescription>Enter recipient details and amount.</DialogDescription>
@@ -166,7 +166,7 @@ export default function PaymentDashboard() {
                     </div>
                   </div>
                   <DialogFooter>
-                    <Button type="submit" onClick={handleSendMoney} disabled={loading}>
+                    <Button className='bg-zinc-500 hover:bg-zinc-600' type="submit" onClick={handleSendMoney} disabled={loading}>
                       {loading ? <Skeleton className="h-4 w-4 animate-spin" /> : 'Send'}
                     </Button>
                   </DialogFooter>
@@ -175,19 +175,19 @@ export default function PaymentDashboard() {
             </CardFooter>
           </Card>
           {/* Tabs for Transactions and Analytics */}
-          <Tabs defaultValue="transactions" className="space-y-4">
-            <TabsList>
+          <Tabs defaultValue="transactions" className="space-y-4 ">
+            <TabsList className='bg-zinc-700 text-zinc-100'>
               <TabsTrigger value="transactions">Transactions</TabsTrigger>
               <TabsTrigger value="analytics">Analytics</TabsTrigger>
             </TabsList>
             <TabsContent value="transactions">
-              <Card>
+              <Card className='bg-zinc-700 text-zinc-100'>
                 <CardHeader>
                   <CardTitle>Recent Transactions</CardTitle>
                   <CardDescription>View your latest payment activities.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <Table>
+                  <Table className='text-zinc-100'>
                     <TableHeader>
                       <TableRow>
                         <TableHead>Date</TableHead>
@@ -202,7 +202,7 @@ export default function PaymentDashboard() {
                         <TableRow key={tx.id}>
                           <TableCell>{tx.date}</TableCell>
                           <TableCell>{tx.type}</TableCell>
-                          <TableCell className={tx.amount > 0 ? 'text-green-600' : 'text-red-600'}>
+                          <TableCell className={tx.amount > 0 ? 'text-zinc-200' : 'text-red-400'}>
                             ${Math.abs(tx.amount).toFixed(2)}
                           </TableCell>
                           <TableCell>{tx.from}</TableCell>
@@ -219,13 +219,13 @@ export default function PaymentDashboard() {
               </Card>
             </TabsContent>
             <TabsContent value="analytics">
-              <Card>
+              <Card className='bg-zinc-700 text-zinc-100'>
                 <CardHeader>
                   <CardTitle>Payment Analytics</CardTitle>
                   <CardDescription>Overview of your spending and receiving trends.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="w-full h-[300px]">
+                  <div className="w-full h-[300px] ">
                     <ResponsiveContainer width="100%" height="100%">
                       <LineChart data={mockChartData}>
                         <CartesianGrid strokeDasharray="3 3" />
