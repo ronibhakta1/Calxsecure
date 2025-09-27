@@ -1,10 +1,11 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useState } from "react";
 import { createOnrampTransaction } from "@/app/lib/actions/createOnramptxn";
+import { TextInput } from "@repo/ui/textinput";
 
 const SUPPORTED_BANKS = [
     { name: "HDFC Bank", redirectUrl: "https://netbanking.hdfcbank.com" },
@@ -26,13 +27,7 @@ export const AddMoney = () => {
             </CardHeader>
             <CardContent className="space-y-4">
                 <div className="space-y-2">
-                    <label className="text-sm font-medium text-zinc-50">Amount</label>
-                    <Input
-                        type="number"
-                        placeholder="Enter amount"
-                        className="border-zinc-800 bg-zinc-700  text-zinc-100 outline-none "
-                        onChange={(e) => setAmount(Number(e.target.value))}
-                    />
+                    <TextInput label={"Amount"} placeholder={"Amount"} onChange={(value) => { setAmount(Number(value)) }} />
                 </div>
                 <div className="space-y-2">
                     <label className="text-sm font-medium text-zinc-50">Select Bank</label>
@@ -61,7 +56,7 @@ export const AddMoney = () => {
                 <Button
                     className="w-full bg-zinc-700 hover:bg-zinc-700 text-white"
                     onClick={async () => {
-                        await createOnrampTransaction(amount, provider);
+                        await createOnrampTransaction(amount * 100, provider);
                         window.location.href = redirectUrl || "";
                     }}
                 >

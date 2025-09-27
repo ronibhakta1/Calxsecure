@@ -1,7 +1,7 @@
 "use client";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Bell, CreditCard, Home, LogOut, Send, Settings, User, Wallet } from 'lucide-react';
+import { Bell, CreditCard, Home, LogOut, Repeat, Send, Settings, User, Wallet } from 'lucide-react';
 import {
   Avatar,
   AvatarFallback,
@@ -47,6 +47,9 @@ function TransferIcon() {
 function TransactionsIcon() {
   return <Wallet className="w-6 h-6" />;
 }
+function P2PIcon() {
+  return <Repeat className="w-6 h-6" />;
+}
 
 export default function Layout({
   children,
@@ -60,8 +63,8 @@ export default function Layout({
     try {
       console.log("Attempting to sign out...");
       await signOut({ redirect: false }); // Prevent default redirect
-      console.log("Sign out successful, redirecting to /signup");
-      router.push("/signup"); // Redirect to signup page
+      console.log("Sign out successful, redirecting to /auth/signup");
+      router.push("/auth/signup"); // Redirect to signup page
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -69,13 +72,14 @@ export default function Layout({
 
   return (
     <TooltipProvider>
-      <div className="flex bg-zinc-800 text-zinc-100">
+      <div className="flex bg-zinc-800 text-zinc-100 h-screen">
         {/* Sidebar */}
         <aside className="w-72 border-r border-slate-200 flex flex-col">
           <nav className="mt-6 flex-1">
             <SidebarItem href="/dashboard" icon={<HomeIcon />} title="Home" />
             <SidebarItem href="/transfer" icon={<TransferIcon />} title="Transfer" />
             <SidebarItem href="/transactions" icon={<TransactionsIcon />} title="Transactions" />
+            <SidebarItem href="/p2p" icon={<P2PIcon />} title="P2P Transfer" />
             <SidebarItem href="/cards" icon={<CreditCard className="w-6 h-6" />} title="Cards" />
             <SidebarItem href="/settings" icon={<Settings className="w-6 h-6" />} title="Settings" />
           </nav>
