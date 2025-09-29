@@ -1,11 +1,17 @@
 {
-  "name": "week-18",
+  "name": "calxsecure",
   "private": true,
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
     "lint": "turbo lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\""
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "docker:clean": "docker-compose down -v --rmi all",
+    "docker:migrate": "docker-compose run --rm migrate"
   },
   "devDependencies": {
     "@repo/eslint-config": "*",
@@ -22,7 +28,9 @@
     "packages/*"
   ],
   "dependencies": {
+    "@repo/store": "^1.0.0",
+    "esbuild": "0.25.10",
     "lucide-react": "^0.543.0",
-    "webpack": "^4.47.0"
+    "webpack": "^5.101.3"
   }
 }

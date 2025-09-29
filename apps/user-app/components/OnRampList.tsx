@@ -4,14 +4,18 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 export function OnRampList({ onRamps }: { onRamps: any[] }) {
   return (
-    <Card className="bg-zinc-700 text-zinc-100">
+    <Card className="bg-zinc-700 text-zinc-100" aria-labelledby="onramp-title">
       <CardHeader>
-        <CardTitle>On-Ramp Transactions</CardTitle>
+        <CardTitle id="onramp-title">On-Ramp Transactions</CardTitle>
       </CardHeader>
       <CardContent>
         <ul className="space-y-3">
           {onRamps.map((r) => (
-            <li key={r.id} className="flex justify-between border-b border-zinc-600 pb-2">
+            <li
+              key={r.id}
+              className="flex justify-between border-b border-zinc-600 pb-2 transition-all hover:bg-zinc-600/50"
+              aria-label={`On-ramp transaction with ${r.provider}, status: ${r.status}`}
+            >
               <div>
                 <p className="text-sm">Provider: {r.provider}</p>
                 <p className="text-xs text-zinc-400">

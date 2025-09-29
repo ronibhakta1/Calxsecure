@@ -1,3 +1,4 @@
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -37,14 +38,16 @@ model Merchant {
 }
 
 model OnRampTransaction {
-  id        Int          @id @default(autoincrement())
-  status    OnRampStatus
-  token     String       @unique
-  provider  String
-  amount    Int
-  startTime DateTime
-  userId    Int
-  user      User         @relation(fields: [userId], references: [id])
+  id            Int          @id @default(autoincrement())
+  status        OnRampStatus
+  token         String       @unique
+  provider      String
+  amount        Int
+  startTime     DateTime     @default(now())
+  transactionId String?      @unique // Bank transaction ID
+  userId        Int
+  user          User         @relation(fields: [userId], references: [id])
+  @@index([userId, startTime]) // Optimize queries
 }
 
 model Balance {

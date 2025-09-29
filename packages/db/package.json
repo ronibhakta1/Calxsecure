@@ -12,5 +12,11 @@
     },
     "prisma": {
         "seed": "ts-node prisma/seed.ts"
-    }
+    },
+    
+  "scripts": {
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate deploy"
+  }
+
 }

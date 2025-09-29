@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@repo/db": "*",
-    "@repo/store": "*",
+    "@repo/store": "^1.0.0",
     "@repo/ui": "*",
     "next": "^14.1.1",
     "next-auth": "^4.24.7",

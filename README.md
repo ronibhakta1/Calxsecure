@@ -25,7 +25,7 @@ npm install
 
 ### 3. Set up PostgreSQL
 ```bash
-docker run -e POSTGRES_PASSWORD=mysecretpassword -d -p 5432:5432 postgres
+docker run -d --name my-postgres -e POSTGRES_PASSWORD=pass123 -p 5432:5432 postgres
 ```
 Or use a cloud provider like Neon.tech
 

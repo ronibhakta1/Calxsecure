@@ -16,6 +16,11 @@ export const AddMoney = () => {
     const [redirectUrl, setRedirectUrl] = useState(SUPPORTED_BANKS[0]?.redirectUrl);
     const [amount, setAmount] = useState(0);
     const [provider, setProvider] = useState(SUPPORTED_BANKS[0]?.name || "");
+    const handleAddMoney = async () => {
+        await createOnrampTransaction(amount * 100, provider);
+        onSuccess?.(); // trigger refresh
+        window.location.href = redirectUrl || ""; // optional if you still need to redirect
+    };
 
     return (
         <Card className="border bg-zinc-800 shadow-sm">
@@ -55,14 +60,13 @@ export const AddMoney = () => {
             <CardFooter>
                 <Button
                     className="w-full bg-zinc-700 hover:bg-zinc-700 text-white"
-                    onClick={async () => {
-                        await createOnrampTransaction(amount * 100, provider);
-                        window.location.href = redirectUrl || "";
-                    }}
-                >
+                    onClick={handleAddMoney}>
                     Add Money
                 </Button>
             </CardFooter>
         </Card>
     );
 };
+function onSuccess() {
+    window.location.reload();
+}
