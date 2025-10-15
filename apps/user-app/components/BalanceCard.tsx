@@ -3,6 +3,7 @@
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 export function BalanceCard({ amount, locked }: { amount: number; locked: number }) {
   return (
@@ -24,12 +25,12 @@ export function BalanceCard({ amount, locked }: { amount: number; locked: number
           <span className="text-sm">₹{(locked / 100).toFixed(2)}</span>
         </div>
         <div className="mt-4 flex space-x-2">
-          <Button className="bg-blue-500 hover:bg-blue-600" aria-label="Send Money">
+          <Link className="bg-zinc-500 hover:bg-zinc-600 p-2 rounded" aria-label="Send Money" href="/p2p">
             Send Money
-          </Button>
-          <Button className="bg-green-500 hover:bg-green-600" aria-label="Add Funds">
+          </Link>
+          <Link className="bg-zinc-500 hover:bg-zinc-600 p-2 rounded" aria-label="Add Funds" href="/transfer">
             Add Funds
-          </Button>
+          </Link>
         </div>
       </CardContent>
     </Card>

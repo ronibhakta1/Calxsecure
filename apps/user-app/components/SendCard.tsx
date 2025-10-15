@@ -27,11 +27,15 @@ export function SendCard() {
         <div className="bg-zinc-800 text-zinc-100 p-4 rounded-md w-full max-w-md mx-auto">
             <Card title="Send">
                 <div className="min-w-72 pt-2">
-                    <TextInput placeholder={"Number"} label="Number" onChange={setNumber} />
+                    <TextInput placeholder={"Number"} label="Mobile Number" onChange={setNumber} />
                     <TextInput placeholder={"Amount"} label="Amount" onChange={setAmount} />
                     <div className="pt-4 flex justify-center">
                         <Button onClick={() => { if (!loading) handleSend(); }}>
-                            {loading ? "Sending..." : "Send"}
+                            {loading ? "Sending..." : (
+                        <>
+                            Pay ₹{amount || 0}
+                        </>
+                    )}
                         </Button>
                     </div>
                     {message && (

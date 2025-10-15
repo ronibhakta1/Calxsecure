@@ -7,5 +7,8 @@
   },
   "exports": {
     "./balance": "./balance.ts"
-  }
+  },
+  "workspaces": [
+    "apps/*"
+  ]
 }

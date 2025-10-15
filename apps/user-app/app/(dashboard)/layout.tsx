@@ -1,7 +1,7 @@
 "use client";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Bell, CreditCard, Home, LogOut, Repeat, Send, Settings, User, Wallet } from 'lucide-react';
+import {  Home, LogOut, Repeat, Send, User, Wallet } from 'lucide-react';
 import {
   Avatar,
   AvatarFallback,
@@ -44,9 +44,6 @@ function TransferIcon() {
   return <Send className="w-6 h-6" />;
 }
 
-function TransactionsIcon() {
-  return <Wallet className="w-6 h-6" />;
-}
 function P2PIcon() {
   return <Repeat className="w-6 h-6" />;
 }
@@ -78,10 +75,7 @@ export default function Layout({
           <nav className="mt-6 flex-1">
             <SidebarItem href="/dashboard" icon={<HomeIcon />} title="Home" />
             <SidebarItem href="/transfer" icon={<TransferIcon />} title="Transfer" />
-            <SidebarItem href="/transactions" icon={<TransactionsIcon />} title="Transactions" />
             <SidebarItem href="/p2p" icon={<P2PIcon />} title="P2P Transfer" />
-            <SidebarItem href="/cards" icon={<CreditCard className="w-6 h-6" />} title="Cards" />
-            <SidebarItem href="/settings" icon={<Settings className="w-6 h-6" />} title="Settings" />
           </nav>
           <div className="p-4">
             <Separator className="mb-4" />
