@@ -4,12 +4,8 @@ const app = express();
 
 app.use(express.json())
 app.post("/hdfcWebhook", async (req, res) => {
-    // TODO: Add zod validation here?
-    // TODO: HDFC bank should ideally send us a secret so we know this is sent by them
     const { token, amount } = req.body; // Real HDFC payload
     
-    // ❌ YOUR ISSUE: No userId in webhook!
-    // ✅ FIX: Find user from token
     try {
         const transaction = await db.onRampTransaction.findUnique({
             where: { token }

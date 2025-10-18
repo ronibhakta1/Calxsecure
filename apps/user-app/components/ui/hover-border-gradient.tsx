@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, } from "react";
 
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
@@ -57,19 +57,19 @@ export function HoverBorderGradient({
   }, [hovered]);
   return (
     <Tag
-      onMouseEnter={(event: React.MouseEvent<HTMLDivElement>) => {
+      onMouseEnter={() => {
         setHovered(true);
       }}
       onMouseLeave={() => setHovered(false)}
       className={cn(
-        "relative flex rounded-full border  content-center bg-gray-500 hover:bg-gray-400 transition duration-500  items-center flex-col flex-nowrap gap-10 h-min justify-center overflow-visible p-px decoration-clone w-fit",
+        "relative flex rounded-full border  content-center bg-white hover:bg-gray-200 transition duration-500  items-center flex-col flex-nowrap gap-10 h-min justify-center overflow-visible p-px decoration-clone w-fit",
         containerClassName
       )}
       {...props}
     >
       <div
         className={cn(
-          "w-auto text-white z-10 bg-black px-4 py-2 rounded-[inherit]",
+          "w-auto text-gray-900 z-10 bg-white px-4 py-2 rounded-[inherit]",
           className
         )}
       >
@@ -93,7 +93,7 @@ export function HoverBorderGradient({
         }}
         transition={{ ease: "linear", duration: duration ?? 1 }}
       />
-      <div className="bg-gray-500 absolute z-1 flex-none inset-[2px] rounded-[100px]" />
+      <div className="bg-gray-100 absolute z-1 flex-none inset-[2px] rounded-[100px]" />
     </Tag>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import {  Home, LogOut, Repeat, Send, User, Wallet } from 'lucide-react';
+import {  Home, LogOut, Repeat, Send, User } from 'lucide-react';
 import {
   Avatar,
   AvatarFallback,
@@ -73,7 +73,8 @@ export default function Layout({
         {/* Sidebar */}
         <aside className="w-72 border-r border-slate-200 flex flex-col">
           <nav className="mt-6 flex-1">
-            <SidebarItem href="/dashboard" icon={<HomeIcon />} title="Home" />
+            <SidebarItem href="/" icon={<HomeIcon />} title="Home" />
+            <SidebarItem href="/dashboard" icon={<HomeIcon />} title="Dashboard" />
             <SidebarItem href="/transfer" icon={<TransferIcon />} title="Transfer" />
             <SidebarItem href="/p2p" icon={<P2PIcon />} title="P2P Transfer" />
           </nav>

@@ -1,4 +1,3 @@
-// app/transfer/page.tsx (Server Component)
 
 import { getServerSession } from "next-auth";
 import prisma from "@repo/db/client";

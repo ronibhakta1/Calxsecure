@@ -97,8 +97,8 @@ const SVG = ({
       xmlns="http://www.w3.org/2000/svg"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      transition={{ duration: 1 }}
-      className="absolute inset-0 w-full h-full"
+      transition={{ duration: 5 }}
+      className="absolute inset-0 w-full h-screen"
     >
       {paths.map((path, idx) => (
         <motion.path

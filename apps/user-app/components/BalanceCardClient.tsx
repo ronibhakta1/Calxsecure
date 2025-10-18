@@ -41,7 +41,7 @@ export const BalanceCardClient = () => {
     // optionally subscribe to an event or poll if real-time updates are needed
   }, []);
 
-  if (loading) return <BalanceCard amount={0} locked={0} loading />;
+  if (loading) return <BalanceCard amount={0} locked={0} />;
   if (error) return <div className="text-red-500">Error loading balance</div>;
 
   return <BalanceCard amount={balance.amount} locked={balance.locked} />;
