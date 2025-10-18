@@ -12,6 +12,12 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "dev:webhook": {
+      "cache": false,
+      "persistent": true,
+      "command": "tsx apps/backend/src/webhook.ts"
     }
+  
   }
 }

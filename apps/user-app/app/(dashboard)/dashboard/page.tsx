@@ -4,7 +4,6 @@ import { BalanceCard } from "@/components/BalanceCard";
 import { TransferList } from "@/components/TransferList";
 import { OnRampList } from "@/components/OnRampList";
 import { StatsCards } from "@/components/StatsCards";
-import { TransactionChart } from "@/components/TransactionsChart";
 import { DashboardClient } from "@/components/DashboardClient";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Toaster } from "react-hot-toast";
@@ -84,7 +83,7 @@ export default async function DashboardPage() {
   }
 
   const userId = Number(session.user.id);
-  const { balance, transfers, onRamps, chartData } = await getDashboardData(userId);
+  const { balance, transfers, onRamps } = await getDashboardData(userId);
 
   return (
     <DashboardClient transfers={transfers}>
@@ -105,10 +104,6 @@ export default async function DashboardPage() {
           <BalanceCard amount={balance.amount} locked={balance.locked} />
           <StatsCards transfers={transfers} onRamps={onRamps} />
         </div>
-
-        {/* Transaction Chart */}
-        <TransactionChart chartData={chartData} />
-
 
         {/* Transfers & OnRamps */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

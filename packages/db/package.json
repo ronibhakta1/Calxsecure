@@ -2,10 +2,10 @@
     "name": "@repo/db",
     "version": "0.0.0",
     "dependencies": {
-        "@prisma/client": "^6.16.1"
+        "@prisma/client": "^6.17.1"
     },
     "devDependencies": {
-        "prisma": "^6.16.1"
+        "prisma": "^6.17.1"
     },
     "exports": {
         "./client": "./index.ts"
@@ -13,10 +13,8 @@
     "prisma": {
         "seed": "ts-node prisma/seed.ts"
     },
-    
-  "scripts": {
-    "db:generate": "prisma generate",
-    "db:migrate": "prisma migrate deploy"
-  }
-
+    "scripts": {
+        "db:generate": "prisma generate",
+        "db:migrate": "prisma migrate deploy"
+    }
 }
