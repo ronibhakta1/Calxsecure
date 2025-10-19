@@ -1,47 +1,48 @@
-# 🔐 Calxsecure
+# 🔐 **Calxsecure**
 
-Calxsecure is a full-stack **monorepo project** built with **Prisma + PostgreSQL**, **Recoil state management**, and **Reusable UI components**.
+**Calxsecure** is a full-stack **monorepo project** built with **TurboRepo**, **Prisma + PostgreSQL**, **Next.js**, **Recoil state management**, and **Reusable UI components**.
 
-This repo demonstrates a secure and scalable app setup, featuring:
 
-- **Database package (`db`)** — Prisma ORM, migrations, seeding.  
-- **Store package (`store`)** — Recoil state management.  
-- **UI package (`ui`)** — Shared React components.  
-- **User App (`apps/user-app`)** — Example frontend application.  
+This repo demonstrates a **secure, scalable banking app** with:
+- **User App** — Customer banking portal
+- **Merchant App** — Business dashboard  
+- **Docs Site** — Project documentation
+- **Bank Webhook** — Payment processing
+- **Database package (`db`)** — Prisma ORM, migrations
+- **Store package (`store`)** — Recoil state management
+- **UI package (`ui`)** — Shared React components
 
 ---
 
-## 🚀 Getting Started
+## 🚀 **ONE-COMMAND SETUP** *(Your Contribution!)*
 
-### 1. Clone the repo
 ```bash
 git clone https://github.com/ronibhakta1/Calxsecure.git
 cd Calxsecure
-```
-### 2. Install dependencies
-```bash
 npm install
+npm run docker:up && npm run dev
 ```
-
-### 3. Set up PostgreSQL
+## 📁 PROJECT STRUCTURE
+Calxsecure/
+├── apps/
+│   ├── userapp/         
+│   ├── merchantapp/      
+├── packages/
+│   ├── db/              # Prisma + PostgreSQL
+│   ├── store/           # Recoil state
+│   └── ui/              # Shared components
+├── docker-compose.yml   
+└── Dockerfile           
+## 💻 DEVELOPMENT WORKFLOW
 ```bash
-docker run -d --name my-postgres -e POSTGRES_PASSWORD=pass123 -p 5432:5432 postgres
-```
-Or use a cloud provider like Neon.tech
-
-### 4. Configure environment variables
-Copy all .env.example files to .env.
-Update the DATABASE_URL with your Postgres connection string.
-
-### 5. Set up the database
-```bash
-cd packages/db
-npx prisma migrate dev
-npx prisma db seed
-```
-
-### 6. Run the apps
-```bash
+npm run docker:up    
 npm run dev
+     
+# When done
+npm run docker:down  # Stop DB
 ```
-
+## Before PR must do
+```bash
+npm run build
+```
+### ⭐ Star this repo! Made with ❤️ by the Calxsecure Team
