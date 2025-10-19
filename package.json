@@ -6,12 +6,12 @@
     "dev": "turbo dev",
     "lint": "turbo lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "docker:build": "docker-compose build",
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down",
-    "docker:logs": "docker-compose logs -f",
-    "docker:clean": "docker-compose down -v --rmi all",
-    "docker:migrate": "docker-compose run --rm migrate"
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f",
+    "docker:build": "docker compose build",
+    "docker:migrate": "docker compose run --rm migrate",
+    "docker:health": "docker compose ps && curl -s http://localhost:3001 || echo 'Apps not ready'"
   },
   "devDependencies": {
     "@repo/eslint-config": "*",

@@ -1,126 +1,32 @@
+version: '3.8'
+
 services:
-  postgres:
-    image: postgres:15
-    container_name: calxsecure-postgres
+  db:
+    image: postgres:14-alpine  
     restart: always
-    env_file:
-      - packages/db/.env
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-      POSTGRES_DB: ${POSTGRES_DB:-calxsecure}
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: postgres
     ports:
-      - "5432:5432"
+      - '5431:5432'
     volumes:
-      - pgdata:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    networks:
-      - calxsecure-network
-    dns:
-      - 8.8.8.8
-      - 1.1.1.1
+      - db-data:/var/lib/postgresql/data
 
-  user-app:
-    build:
-      context: ./apps/user-app
-      dockerfile: Dockerfile
-    container_name: calxsecure-user-app
-    depends_on:
-      postgres:
-        condition: service_healthy
-    env_file:
-      - packages/db/.env
-      - apps/user-app/.env
-    environment:
-      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-calxsecure}
-      NEXTAUTH_URL: http://localhost:3000
-      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-default_nextauth_secret}
-      JWT_SECRET: ${JWT_SECRET:-test}
-    ports:
-      - "3000:3000"
-    command: sh -c "npx turbo run db:generate --filter=@repo/db && npx turbo run db:migrate --filter=@repo/db && npm run start"
-    networks:
-      - calxsecure-network
-    dns:
-      - 8.8.8.8
-      - 1.1.1.1
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              capabilities: [gpu] 
 
-  bank-webhook:
-    build:
-      context: ./apps/bank-webhook
-      dockerfile: Dockerfile
-    container_name: calxsecure-bank-webhook
+  migrate:
+    build: .
+    command: npm run db:migrate --workspace=@repo/db
     depends_on:
-      postgres:
-        condition: service_healthy
-    env_file:
-      - packages/db/.env
+      - db
     environment:
-      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-calxsecure}
-      JWT_SECRET: ${JWT_SECRET:-test}
-    ports:
-      - "3003:3003"
-    command: sh -c "npx turbo run db:generate --filter=@repo/db && npx turbo run db:migrate --filter=@repo/db && npm run start"
-    networks:
-      - calxsecure-network
-    dns:
-      - 8.8.8.8
-      - 1.1.1.1
-
-  merchant-app:
-    build:
-      context: ./apps/merchant-app
-      dockerfile: Dockerfile
-    container_name: calxsecure-merchant-app
-    depends_on:
-      postgres:
-        condition: service_healthy
-    env_file:
-      - packages/db/.env
-    environment:
-      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-calxsecure}
-      NEXTAUTH_URL: http://localhost:3001
-      NEXTAUTH_SECRET: ${NEXTAUTH_SECRET:-default_nextauth_secret}
-      JWT_SECRET: ${JWT_SECRET:-test}
-    ports:
-      - "3001:3001"
-    command: sh -c "npx turbo run db:generate --filter=@repo/db && npx turbo run db:migrate --filter=@repo/db && npm run start"
-    networks:
-      - calxsecure-network
-    dns:
-      - 8.8.8.8
-      - 1.1.1.1
-
-  merchant-backend:
-    build:
-      context: ./apps/merchant-backend
-      dockerfile: Dockerfile
-    container_name: calxsecure-merchant-backend
-    depends_on:
-      postgres:
-        condition: service_healthy
-    env_file:
-      - packages/db/.env
-    environment:
-      DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-calxsecure}
-      JWT_SECRET: ${JWT_SECRET:-test}
-      MERCHANT_WEBHOOK_SECRET: ${MERCHANT_WEBHOOK_SECRET:-default_webhook_secret}
-    ports:
-      - "3004:3004"
-    command: sh -c "npx turbo run db:generate --filter=@repo/db && npx turbo run db:migrate --filter=@repo/db && npm run start"
-    networks:
-      - calxsecure-network
-    dns:
-      - 8.8.8.8
-      - 1.1.1.1
+      DATABASE_URL: postgresql://postgres:mysecretpassword@db:5432/postgres
 
 volumes:
-  pgdata:
-
-networks:
-  calxsecure-network:
-    driver: bridge
+  db-data:
