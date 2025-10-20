@@ -1,4 +1,3 @@
-// app/transfer/page.tsx (Server Component)
 
 import { getServerSession } from "next-auth";
 import prisma from "@repo/db/client";
@@ -7,7 +6,6 @@ import { AddMoney } from "@/components/AddMoneyCard";
 import { OnRampList } from "@/components/OnRampList";
 
 export default async function TransferPage() {
-  // Get session
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
@@ -24,18 +22,25 @@ export default async function TransferPage() {
   const onRamps = await prisma.onRampTransaction.findMany({
     where: { userId },
     orderBy: { startTime: "desc" },
-    take: 10, // show latest 10
+    take: 10,
   });
+  const  user   = await prisma.user.findFirst({
+    where: { id: userId }
+  });
+  if(!user?.userpin){
+    console.log("User PIN not set. Redirecting to set PIN page.");
+  }
+  
 
   return (
-    <div className="bg-zinc-900 min-h-screen p-6">
+    <div className=" min-h-screen p-6">
       <div className="max-w-7xl mx-auto space-y-8 scrollbar-hide">
         <h1 className="text-3xl font-bold text-zinc-100">Transfer Funds</h1>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
           {/* Left side - Add Money card */}
           <div className="space-y-5">
-            <AddMoney />
+            <AddMoney userpin={user?.userpin ?? "1234"} />
           </div>
 
           {/* Right side - OnRamp Transaction History */}

@@ -99,7 +99,7 @@ export default async function DashboardPage() {
           </h1>
         </div>
 
-        {/* Top Section */}
+        {/* Top Section */} 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <BalanceCard amount={balance.amount} locked={balance.locked} />
           <StatsCards transfers={transfers} onRamps={onRamps} />

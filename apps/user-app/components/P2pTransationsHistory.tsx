@@ -9,7 +9,7 @@ export async function P2PTransactionHistory() {
   }
 
   return (
-    <div className="bg-zinc-800 rounded-md p-4 mt-6">
+    <div className="border border-zinc-100 rounded-md p-4 mt-6">
       <h2 className="text-lg font-semibold text-zinc-100 mb-4">Transaction History</h2>
       <table className="w-full text-zinc-100">
         <thead>

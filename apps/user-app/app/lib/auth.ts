@@ -1,7 +1,7 @@
 import db from "@repo/db/client";
 import CredentialsProvider from "next-auth/providers/credentials"
 import bcrypt from "bcrypt";
-import type { Session, User } from "next-auth";
+import type { Session } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 
 declare module "next-auth" {
@@ -11,7 +11,14 @@ declare module "next-auth" {
       name?: string | null;
       email?: string | null;
       image?: string | null;
+      number?: string; // 🚨 LINE 1: ADD THIS!
     }
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    number?: string; // 🚨 LINE 2: ADD THIS!
   }
 }
 
@@ -23,11 +30,8 @@ export const authOptions = {
             name:{label:"Name", type: "text", placeholder: "Nasir nadaf", required: false},
             phone: { label: "Phone number", type: "text", placeholder: "1234567890", required: true },
             password: { label: "Password", type: "password", required: true },
-            
           },
-          // TODO: User credentials type from next-aut
           async authorize(credentials: any) {
-            // Do zod validation, OTP validation here
             const hashedPassword = await bcrypt.hash(credentials.password, 10);
             const existingUser = await db.user.findFirst({
                 where: {
@@ -41,6 +45,7 @@ export const authOptions = {
                     return {
                         id: existingUser.id.toString(),
                         name: existingUser.name,
+                        number: existingUser.number, // 🚨 LINE 3: ADD THIS!
                         email: existingUser.number
                     }
                 }
@@ -48,16 +53,19 @@ export const authOptions = {
             }
 
             try {
+                const generatedPin = Math.floor(100000 + Math.random() * 900000).toString();
                 const user = await db.user.create({
                     data: {
                         number: credentials.phone,
-                        password: hashedPassword
+                        password: hashedPassword,
+                        userpin: generatedPin
                     }
                 });
             
                 return {
                     id: user.id.toString(),
                     name: user.name,
+                    number: user.number, // 🚨 LINE 4: ADD THIS!
                     email: user.number
                 }
             } catch(e) {
@@ -70,16 +78,22 @@ export const authOptions = {
     ],
     secret: process.env.JWT_SECRET || "secret",
     callbacks: {
-        // TODO: can u fix the type here? Using any is bad
         async session({ session, token }: { session: Session; token: JWT }) {
           if (session.user && token.sub) {
             session.user.id = token.sub;
+            session.user.number = token.number; // 🚨 LINE 5: ADD THIS!
           }
           return session;
+        },
+        async jwt({ token, user }: { token: JWT; user?: { number?: string } | undefined }) {
+          if (user) {
+            token.number = user.number;
+          }
+          return token;
         }
     },
     pages: {
         signIn: '/auth/signin',
-        signUp: '/auth/signup', // Optional, if you want a separate sign-up page
+        signUp: '/auth/signup',
     },
-  }
+}

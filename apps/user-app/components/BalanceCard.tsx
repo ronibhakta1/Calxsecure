@@ -2,7 +2,6 @@
 "use client";
 
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export function BalanceCard({ amount, locked }: { amount: number; locked: number }) {

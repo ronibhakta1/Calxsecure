@@ -40,7 +40,6 @@ export function TransactionChart({
   // Transform data to {x, y} objects for time scale
   const transformData = (values: number[]) =>
     values.map((y, i) => ({
-      x: new Date(labels[i]), // important! must be Date objects
       y,
     }));
 

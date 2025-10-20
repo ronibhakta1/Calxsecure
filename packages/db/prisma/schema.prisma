@@ -13,10 +13,14 @@ model User {
   name              String?
   number            String              @unique
   password          String
+  userpin          String
   OnRampTransaction OnRampTransaction[]
   Balance           Balance[]
   sentTransfers     p2pTransfer[]       @relation(name: "FromUserRelation")
   receivedTransfers p2pTransfer[]       @relation(name: "ToUserRelation")
+  sentRequests      P2PRequest[]        @relation("P2PRequestSender")
+  receivedRequests  P2PRequest[]       @relation("P2PRequestReceiver")
+  billSchedules     BillSchedule[]
 }
 
 model p2pTransfer {
@@ -49,6 +53,51 @@ model OnRampTransaction {
   @@index([userId, startTime]) // Optimize queries
 }
 
+model P2PRequest {
+  id           Int      @id @default(autoincrement())
+  senderId     Int
+  sender       User     @relation("P2PRequestSender", fields: [senderId], references: [id])
+  receiverId   Int?
+  receiver     User?    @relation("P2PRequestReceiver", fields: [receiverId], references: [id])
+  receiverNumber String
+  amount       Int      
+  message      String?
+  status       P2PRequestStatus @default(PENDING)
+  createdAt    DateTime @default(now())
+  settledAt    DateTime?
+  
+  @@map("p2p_requests")
+}
+
+model BillSchedule {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  billType    String   // 🚨 FIXED: String (not enum)
+  provider    String
+  accountNo   String
+  amount      Int      // 🚨 FIXED: Int (not Float)
+  dueDate     DateTime
+  nextPayment DateTime?
+  createdAt   DateTime @default(now())
+  
+  @@map("bill_schedules")
+}
+
+enum BillType {
+  ELECTRICITY
+  WATER
+  GAS
+  PHONE_RECHARGE
+  DTH
+}
+
+enum P2PRequestStatus {
+  PENDING
+  SETTLED
+  EXPIRED
+  CANCELLED
+}
 model Balance {
   id     Int  @id @default(autoincrement())
   userId Int  @unique
