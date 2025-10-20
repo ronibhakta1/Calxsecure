@@ -15,8 +15,8 @@ async function main() {
       name: 'Nasir',
       Balance: {
         create: {
-            amount: 20000,
-            locked: 0
+          amount: 20000,
+          locked: 0
         }
       },
       OnRampTransaction: {
@@ -42,8 +42,8 @@ async function main() {
       name: 'Vikas',
       Balance: {
         create: {
-            amount: 2000,
-            locked: 0
+          amount: 2000,
+          locked: 0
         }
       },
       OnRampTransaction: {
@@ -58,37 +58,37 @@ async function main() {
     },
   })
 
-  // 🚨 YOUR P2P REQUESTS (UNCHANGED)
+  // 🚨 P2P Requests
   await prisma.p2PRequest.createMany({
     data: [
       {
         senderId: Nasir.id,
         receiverNumber: "2222222222",
-        amount: 500 * 100,
+        amount: 500, // Already Int
         message: "Dinner split",
         status: "PENDING",
       },
       {
         senderId: Vikas.id,
         receiverNumber: "1111111111",
-        amount: 200 * 100,
+        amount: 200, 
         message: "Movie ticket",
         status: "PENDING",
       },
     ],
   });
 
-  // 🚨 YOUR P2P TRANSFERS (UNCHANGED)
+  // 🚨 P2P Transfers
   await prisma.p2pTransfer.createMany({
     data: [
       {
-        amount: 1000 * 100,
+        amount: 1000,
         timestamp: new Date(),
         fromUserId: Nasir.id,
         toUserId: Vikas.id,
       },
       {
-        amount: 300 * 100,
+        amount: 300,
         timestamp: new Date(Date.now() - 86400000),
         fromUserId: Vikas.id,
         toUserId: Nasir.id,
@@ -96,84 +96,77 @@ async function main() {
     ],
   });
 
-  // 🚨 NEW: SAMPLE BILLS FOR NASIR (5 TYPES!)
-  await prisma.BillSchedule.createMany({
+  // 🚨 BillSchedules (amounts as Ints, multiplied by 100 if needed)
+  await prisma.billSchedule.createMany({
     data: [
       {
         userId: Nasir.id,
         billType: "ELECTRICITY",
         provider: "BSES Rajdhani",
         accountNo: "EL-123456789",
-        amount: 750.50,
-        dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days
-        nextPayment: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // Next month
+        amount: 751, // Rounded from 750.50
+        dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+        nextPayment: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       },
       {
         userId: Nasir.id,
         billType: "WATER",
         provider: "Delhi Jal Board",
         accountNo: "WB-987654321",
-        amount: 320.00,
-        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 1 week
+        amount: 320,
+        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       },
       {
         userId: Nasir.id,
         billType: "GAS",
         provider: "Indane Gas",
         accountNo: "GAS-456789123",
-        amount: 950.25,
-        dueDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days
+        amount: 950,
+        dueDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000),
       },
       {
         userId: Nasir.id,
         billType: "PHONE_RECHARGE",
         provider: "Airtel",
         accountNo: "1111111111",
-        amount: 299.00,
-        dueDate: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000), // 20 days
+        amount: 299,
+        dueDate: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000),
       },
       {
         userId: Nasir.id,
         billType: "DTH",
         provider: "Tata Sky",
         accountNo: "DTH-789123456",
-        amount: 450.75,
-        dueDate: new Date(Date.now() + 25 * 24 * 60 * 60 * 1000), // 25 days
+        amount: 451, // Rounded from 450.75
+        dueDate: new Date(Date.now() + 25 * 24 * 60 * 60 * 1000),
       },
-    ],
-  });
-
-  // 🚨 NEW: SAMPLE BILLS FOR VIKAS (2 BILLS)
-  await prisma.BillSchedule.createMany({
-    data: [
       {
         userId: Vikas.id,
         billType: "ELECTRICITY",
         provider: "TPDDL",
         accountNo: "EL-456789123",
-        amount: 420.00,
-        dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000), // 5 days
+        amount: 420,
+        dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
       },
       {
         userId: Vikas.id,
         billType: "PHONE_RECHARGE",
         provider: "Jio",
         accountNo: "2222222222",
-        amount: 199.00,
-        dueDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000), // 15 days
+        amount: 199,
+        dueDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
       },
     ],
   });
 
-  console.log(`✅ SEEDED PAYTM CLONE!
+  console.log(`✅ SEEDED DATA:
 📱 Nasir (PIN: 1234) - Balance: ₹20,000
 📱 Vikas (PIN: 5678) - Balance: ₹2,000
 🏦 2 OnRamp Transactions
 💸 2 P2P Transfers  
 📝 2 Pending Requests
-⚡ 7 Scheduled Bills (Electricity, Water, Gas, Phone, DTH)
-🚀 READY FOR BILLS + CARD PAYMENTS!
-  `)
+⚡ 7 Scheduled Bills
+🚀 READY!`)
 }
 
 main()

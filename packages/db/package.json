@@ -1,21 +1,30 @@
 {
-    "name": "@repo/db",
-    "version": "0.0.0",
-    "dependencies": {
-        "@prisma/client": "^6.17.1",
-        "tsx": "^4.20.6"
-    },
-    "devDependencies": {
-        "prisma": "^6.17.1"
-    },
-    "exports": {
-        "./client": "./index.ts"
-    },
-    "prisma": {
-        "seed": "ts-node prisma/seed.ts"
-    },
-    "scripts": {
-        "db:generate": "prisma generate",
-        "db:migrate": "prisma migrate deploy"
-    }
+  "name": "@repo/db",
+  "version": "0.0.0",
+  "dependencies": {
+    "@prisma/client": "^6.17.1",
+    "tsx": "^4.20.6"
+  },
+  "devDependencies": {
+    "prisma": "^6.17.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "exports": {
+    "./client": "./index.ts"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "scripts": {
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate deploy",
+    "db:seed": "prisma db seed"
+  },
+  "type": "module",
+  "description": "",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
