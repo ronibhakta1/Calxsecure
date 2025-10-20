@@ -4,7 +4,7 @@ import React from 'react'
 
 const page = () => {
   return (
-    <div className='w-full'>
+    <div >
       <SendCard />
       <P2PTransactionHistory />
     </div>

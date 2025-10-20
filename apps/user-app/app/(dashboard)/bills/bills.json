@@ -1,0 +1,72 @@
+[
+  {
+    "id": 1,
+    "userId": 1,
+    "billType": "ELECTRICITY",
+    "provider": "BSES Rajdhani",
+    "accountNo": "EL-123456789",
+    "amount": 75000,
+    "dueDate": "2025-10-23",
+    "isRecurring": true
+  },
+  {
+    "id": 2,
+    "userId": 1,
+    "billType": "WATER",
+    "provider": "Delhi Jal Board",
+    "accountNo": "WB-987654321",
+    "amount": 32000,
+    "dueDate": "2025-10-27",
+    "isRecurring": true
+  },
+  {
+    "id": 3,
+    "userId": 1,
+    "billType": "GAS",
+    "provider": "Indane Gas",
+    "accountNo": "GAS-456789123",
+    "amount": 95025,
+    "dueDate": "2025-10-30",
+    "isRecurring": true
+  },
+  {
+    "id": 4,
+    "userId": 1,
+    "billType": "PHONE_RECHARGE",
+    "provider": "Airtel",
+    "accountNo": "1111111111",
+    "amount": 29900,
+    "dueDate": "2025-11-09",
+    "isRecurring": true
+  },
+  {
+    "id": 5,
+    "userId": 1,
+    "billType": "DTH",
+    "provider": "Tata Sky",
+    "accountNo": "DTH-789123456",
+    "amount": 45075,
+    "dueDate": "2025-11-14",
+    "isRecurring": true
+  },
+  {
+    "id": 6,
+    "userId": 2,
+    "billType": "ELECTRICITY",
+    "provider": "TPDDL",
+    "accountNo": "EL-456789123",
+    "amount": 42000,
+    "dueDate": "2025-10-25",
+    "isRecurring": true
+  },
+  {
+    "id": 7,
+    "userId": 2,
+    "billType": "PHONE_RECHARGE",
+    "provider": "Jio",
+    "accountNo": "2222222222",
+    "amount": 19900,
+    "dueDate": "2025-11-04",
+    "isRecurring": true
+  }
+]

@@ -1,6 +1,6 @@
 
 export default function() {
-    return <div>
+    return <div className="text-zinc-100">
         Transactions
     </div>
 }

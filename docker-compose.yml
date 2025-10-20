@@ -1,8 +1,6 @@
-version: '3.8'
-
 services:
   db:
-    image: postgres:14-alpine  
+    image: postgres:14-alpine
     restart: always
     environment:
       POSTGRES_USER: postgres
@@ -13,13 +11,6 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
 
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              capabilities: [gpu] 
-
   migrate:
     build: .
     command: npm run db:migrate --workspace=@repo/db
@@ -27,6 +18,28 @@ services:
       - db
     environment:
       DATABASE_URL: postgresql://postgres:mysecretpassword@db:5432/postgres
+
+  user-app:
+    build: ./apps/user-app
+    command: npm run dev
+    depends_on:
+      - db
+      - migrate
+    environment:
+      DATABASE_URL: postgresql://postgres:mysecretpassword@db:5432/postgres
+    ports:
+      - "3001:3001"
+
+  merchant-app:
+    build: ./apps/merchant-app
+    command: npm run dev
+    depends_on:
+      - db
+      - migrate
+    environment:
+      DATABASE_URL: postgresql://postgres:mysecretpassword@db:5432/postgres
+    ports:
+      - "3002:3002"
 
 volumes:
   db-data:
