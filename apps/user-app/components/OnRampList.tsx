@@ -5,11 +5,8 @@ import { Card, CardHeader, CardTitle, CardContent } from "./ui/card";
 export function OnRampList({ onRamps }: { onRamps: any[] }) {
   return (
     <Card className="bg-zinc-700 text-zinc-100" aria-labelledby="onramp-title">
-      <CardHeader>
-        <CardTitle id="onramp-title">On-Ramp Transactions</CardTitle>
-      </CardHeader>
       <CardContent>
-        <ul className="space-y-3">
+        <ul className="space-y-3 ">
           {onRamps.map((r) => (
             <li
               key={r.id}
