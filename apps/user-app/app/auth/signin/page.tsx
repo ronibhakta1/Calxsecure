@@ -7,7 +7,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "../../../components/ui/card";
 
 export default function SignInPage() {
   const [phone, setPhone] = useState("");

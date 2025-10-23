@@ -2,18 +2,18 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { FloatingNav } from "@/components/ui/floating-navbar";
-import { ContainerTextFlip } from "@/components/ui/container-text-flip";
-import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
+import { FloatingNav } from "../../components/ui/floating-navbar";
+import { ContainerTextFlip } from "../../components/ui/container-text-flip";
+import { HoverBorderGradient } from "../../components/ui/hover-border-gradient";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { AnimatedTestimonials } from "@/components/ui/animated-testimonials";
+import { AnimatedTestimonials } from "../../components/ui/animated-testimonials";
 import roni from "@/public/roni.jpeg";
 import tan from "@/public/tan.jpeg";
 import nasir from "@/public/nasir.jpg";
 import vikas from "@/public/vikas.jpeg";
-import { FeaturesSectionDemo } from "@/components/ui/FeatureSection";
-import { ThreeDMarquee } from "@/components/ui/3d-marquee";
+import { FeaturesSectionDemo } from "../../components/ui/FeatureSection";
+import { ThreeDMarquee } from "../../components/ui/3d-marquee";
 import pic1 from "@/public/pic1.844Z.png";
 import pic2 from "@/public/pic10.484Z.png";
 import pic3 from "@/public/pic11.447Z.png";
@@ -29,7 +29,7 @@ import pic12 from "@/public/one.jpg";
 import pic13 from "@/public/four.png";
 import pic14 from "@/public/three.png";
 import pic15 from "@/public/two.png";
-import { PointerHighlight } from "@/components/ui/pointer-highlight";
+import { PointerHighlight } from "../../components/ui/pointer-highlight";
 
 const Page = () => {
   const navItems = [

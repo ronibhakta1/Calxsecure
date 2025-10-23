@@ -1,12 +1,34 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 import { useState, useEffect } from "react";
 import { createOnrampTransaction } from "@/app/lib/actions/createOnramptxn";
-import { loadWallet } from "@/app/lib/actions/walletActions"; // 🚨 NEW!
+import { loadWallet } from "@/app/lib/actions/walletActions";
 import { TextInput } from "@repo/ui/textinput";
-import { CheckCircle, Loader2, Lock, Eye, EyeOff, CreditCard, Banknote, Smartphone } from "lucide-react";
+import {
+  CheckCircle,
+  Loader2,
+  Lock,
+  Eye,
+  EyeOff,
+  CreditCard,
+  Banknote,
+  Smartphone,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -14,7 +36,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/components/ui/dialog";
+} from "./ui/dialog";
 import { motion } from "motion/react";
 
 const SUPPORTED_BANKS = [
@@ -24,33 +46,45 @@ const SUPPORTED_BANKS = [
 
 const PAYMENT_METHODS = [
   { value: "UPI", label: "UPI/Bank", icon: <Smartphone className="w-4 h-4" /> },
-  { value: "CARD", label: "Credit/Debit Card", icon: <CreditCard className="w-4 h-4" /> },
-  { value: "NETBANKING", label: "Net Banking", icon: <Banknote className="w-4 h-4" /> },
+  {
+    value: "CARD",
+    label: "Credit/Debit Card",
+    icon: <CreditCard className="w-4 h-4" />,
+  },
+  {
+    value: "NETBANKING",
+    label: "Net Banking",
+    icon: <Banknote className="w-4 h-4" />,
+  },
 ];
 
 type PaymentMethod = (typeof PAYMENT_METHODS)[number];
 
 export const AddMoney = ({ userpin }: { userpin: string }) => {
-  // 🚨 EXISTING STATES (UNCHANGED)
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [pin, setPin] = useState("");
   const [showPin, setShowPin] = useState(false);
   const [amount, setAmount] = useState(0);
   const [provider, setProvider] = useState(SUPPORTED_BANKS[0]?.name || "");
-  const [redirectUrl, setRedirectUrl] = useState(SUPPORTED_BANKS[0]?.redirectUrl);
+  const [redirectUrl, setRedirectUrl] = useState(
+    SUPPORTED_BANKS[0]?.redirectUrl
+  );
   const [token, setToken] = useState<string | null>(null);
-  const [status, setStatus] = useState<"idle" | "loading" | "success" | "processing">("idle");
+  const [status, setStatus] = useState<
+    "idle" | "loading" | "success" | "processing"
+  >("idle");
   const [pollInterval, setPollInterval] = useState<NodeJS.Timeout | null>(null);
-
-  // 🚨 NEW STATES: Cards + Net Banking
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(PAYMENT_METHODS[0]!);
+  const [amountError, setAmountError] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>(
+    PAYMENT_METHODS[0]!
+  );
   const [cardNumber, setCardNumber] = useState("");
   const [expiry, setExpiry] = useState("");
   const [cvv, setCvv] = useState("");
   const [cardName, setCardName] = useState("");
   const [razorpayOrderId, setRazorpayOrderId] = useState("");
 
-  // 🚨 RAZORPAY SCRIPT (Load once)
+  // Load Razorpay script
   useEffect(() => {
     const script = document.createElement("script");
     script.src = "https://checkout.razorpay.com/v1/checkout.js";
@@ -72,40 +106,33 @@ export const AddMoney = ({ userpin }: { userpin: string }) => {
   };
 
   const handleAddMoney = async () => {
-    if (amount <= 0) return alert("Amount must be > 0");
+    if (amount <= 0 || isNaN(amount)) {
+      setAmountError("Amount must be greater than 0");
+      setStatus("idle");
+      return;
+    }
+    setAmountError("");
 
     setStatus("loading");
 
-    if (paymentMethod.value === "UPI") {
-      // 🚨 YOUR ORIGINAL UPI FLOW
-      const result = await createOnrampTransaction(amount * 100, provider);
-      if (result.token) {
-        setToken(result.token);
-        setTimeout(() => {
-          setStatus("processing");
-          const bankUrl = `${redirectUrl}?token=${result.token}&amount=${amount}`;
-          window.location.href = bankUrl;
-        }, 2000);
-      } else {
-        setStatus("idle");
-        alert(result.message);
+    const result = await createOnrampTransaction(amount * 100, provider);
+    
+    if(result.token){
+      setToken(result.token);
+      setStatus("processing");
+      if(paymentMethod.value === "UPI"){
+        startPolling(result.token);
       }
-    } else {
-      // 🚨 NEW: CARD/NET BANKING via Razorpay
-      const result = await loadWallet(amount, paymentMethod.value);
-      if (result.success && result.orderId) {
-        setRazorpayOrderId(result.orderId);
-        setStatus("processing");
-        // 🚨 Open Razorpay Modal
-        setTimeout(() => openRazorpay(result.orderId, amount), 1000);
-      } else {
-        setStatus("idle");
-        alert(result.message);
+      else{
+        openRazorpay(result.token, amount);
       }
+    }else{
+      setStatus("idle");
+      alert(result.message);
     }
+     
   };
 
-  // 🚨 NEW: RAZORPAY CHECKOUT
   const openRazorpay = (orderId: string, amount: number) => {
     const options = {
       key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
@@ -116,7 +143,6 @@ export const AddMoney = ({ userpin }: { userpin: string }) => {
       description: `Load ₹${amount}`,
       theme: { color: "#18181b" },
       handler: async function (response: any) {
-        // 🚨 Verify Payment
         const verifyResult = await fetch("/api/verify-payment", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -131,14 +157,14 @@ export const AddMoney = ({ userpin }: { userpin: string }) => {
         }
       },
       modal: { ondismiss: () => setStatus("idle") },
+      config:{
+        display: { 
+          prefer: [paymentMethod.value.toLowerCase()],
+        }
+      }
     };
     const rzp = new (window as any).Razorpay(options);
     rzp.open();
-  };
-
-  const simulateBankReturn = (token: string) => {
-    setToken(token);
-    startPolling(token);
   };
 
   const startPolling = (token: string) => {
@@ -151,7 +177,7 @@ export const AddMoney = ({ userpin }: { userpin: string }) => {
       }
     }, 5000);
     setPollInterval(interval);
-  }; // ✅ <-- Added missing closing brace here
+  };
 
   useEffect(() => {
     return () => {
@@ -164,11 +190,14 @@ export const AddMoney = ({ userpin }: { userpin: string }) => {
       <Card className="border bg-zinc-800 shadow-sm">
         <CardHeader className="text-center">
           <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <CardTitle className="text-xl text-zinc-100">₹{amount} Added!</CardTitle>
+          <CardTitle className="text-xl text-zinc-100">
+            ₹{amount} Added!
+          </CardTitle>
         </CardHeader>
         <CardContent className="text-center">
           <p className="text-zinc-400">
-            {paymentMethod.value === "UPI" ? "Bank transfer" : "Card"} payment successful
+            {paymentMethod.value === "UPI" ? "Bank transfer" : "Card"} payment
+            successful
           </p>
         </CardContent>
         <CardFooter>
@@ -192,42 +221,65 @@ export const AddMoney = ({ userpin }: { userpin: string }) => {
         <CardContent className="space-y-4">
           {status === "idle" && (
             <>
-              <TextInput
-                label="Amount"
-                placeholder="Enter amount"
-                onChange={(value) => setAmount(Number(value))}
-              />
-              
-              {/* 🚨 NEW: PAYMENT METHOD SELECT */}
+              <div>
+                <TextInput
+                  label="Amount"
+                  className="text-zinc-100"
+                  placeholder="Enter amount"
+                  onChange={(value) => {
+                    const numValue = parseFloat(value);
+                    setAmount(isNaN(numValue) ? 0 : numValue);
+                  }}
+                  type="number"
+                />
+                {amountError && (
+                  <p className="text-red-500 text-sm">{amountError}</p>
+                )}
+              </div>
+
               <div>
                 <label className="text-sm font-medium text-zinc-50 mb-2 block">
                   Payment Method
                 </label>
-                <Select value={paymentMethod.value} onValueChange={(value) => {
-                  const method = PAYMENT_METHODS.find(m => m.value === value)!;
-                  setPaymentMethod(method);
-                  setProvider("");
-                }}>
+                <Select
+                  value={paymentMethod.value}
+                  onValueChange={(value) => {
+                    const method = PAYMENT_METHODS.find(
+                      (m) => m.value === value
+                    )!;
+                    setPaymentMethod(method);
+                    setProvider("");
+                  }}
+                >
                   <SelectTrigger className="border-zinc-100 bg-zinc-500 text-zinc-100">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="bg-zinc-500 text-zinc-100">
                     {PAYMENT_METHODS.map((method) => (
-                      <SelectItem key={method.value} value={method.value} className="flex items-center gap-2">
-                        {method.icon} {method.label}
+                      <SelectItem
+                        key={method.value}
+                        value={method.value}
+                        className="flex divide-y w-full items-center"
+                      >
+                        <div className="flex items-center gap-2 p-2">
+                          <span>{method.icon}</span> <span>{method.label}</span>
+                        </div>
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
 
-              {/* 🚨 NEW: UPI BANKS (Only show for UPI) */}
               {paymentMethod.value === "UPI" && (
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-zinc-50">Select Bank</label>
+                  <label className="text-sm font-medium text-zinc-50">
+                    Select Bank
+                  </label>
                   <Select
                     onValueChange={(value) => {
-                      const bank = SUPPORTED_BANKS.find((x) => x.name === value);
+                      const bank = SUPPORTED_BANKS.find(
+                        (x) => x.name === value
+                      );
                       setRedirectUrl(bank?.redirectUrl || "");
                       setProvider(bank?.name || "");
                     }}
@@ -247,12 +299,11 @@ export const AddMoney = ({ userpin }: { userpin: string }) => {
                 </div>
               )}
 
-              {/* 🚨 NEW: CARD FORM (Only show for CARD) */}
               {paymentMethod.value === "CARD" && (
-                <motion.div 
-                  initial={{ opacity: 0, height: 0 }} 
-                  animate={{ opacity: 1, height: "auto" }} 
-                  className="space-y-3 overflow-hidden"
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  className="space-y-3 overflow-hidden transition-all duration-300 text-zinc-100"
                 >
                   <TextInput
                     label="Card Number"
@@ -273,7 +324,7 @@ export const AddMoney = ({ userpin }: { userpin: string }) => {
                   </div>
                   <TextInput
                     label="Name on Card"
-                    placeholder="John Doe"
+                    placeholder="vikas budhyal"
                     onChange={setCardName}
                   />
                 </motion.div>
@@ -300,10 +351,21 @@ export const AddMoney = ({ userpin }: { userpin: string }) => {
 
         {status === "idle" && (
           <CardFooter>
-            <Dialog open={showPasswordModal} onOpenChange={setShowPasswordModal}>
-              <DialogTrigger asChild className="flex w-full items-center">
+            <Dialog
+              open={showPasswordModal}
+              onOpenChange={setShowPasswordModal}
+            >
+              <DialogTrigger
+                asChild
+                className="flex w-full items-center"
+                onClick={(e) => {
+                  if (amount <= 0 || isNaN(amount)) {
+                    e.preventDefault();
+                    setAmountError("Please enter a valid amount");
+                  }
+                }}
+              >
                 <Button className="bg-zinc-600 hover:bg-zinc-500">
-                  <Lock className="w-4 h-4 mr-2" />
                   Add ₹{amount || 0} via {paymentMethod.label}
                 </Button>
               </DialogTrigger>
@@ -314,7 +376,8 @@ export const AddMoney = ({ userpin }: { userpin: string }) => {
                     Enter PIN
                   </DialogTitle>
                   <DialogDescription>
-                    Confirm your 4-digit PIN to add ₹{amount} via {paymentMethod.label}
+                    Confirm your 4-digit PIN to add ₹{amount} via{" "}
+                    {paymentMethod.label}
                   </DialogDescription>
                 </DialogHeader>
                 <motion.div
@@ -336,7 +399,11 @@ export const AddMoney = ({ userpin }: { userpin: string }) => {
                       onClick={() => setShowPin(!showPin)}
                       className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400"
                     >
-                      {showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showPin ? (
+                        <EyeOff className="w-4 h-4" />
+                      ) : (
+                        <Eye className="w-4 h-4" />
+                      )}
                     </button>
                   </div>
                   <Button
@@ -352,8 +419,6 @@ export const AddMoney = ({ userpin }: { userpin: string }) => {
           </CardFooter>
         )}
       </Card>
-
-      {simulateBankReturn}
     </>
   );
 };

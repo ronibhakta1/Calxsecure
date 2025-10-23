@@ -1,7 +1,7 @@
 "use client";
 import { p2pTransfer } from "@/app/lib/actions/p2pTransfer";
 import { Button } from "@repo/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { TextInput } from "@repo/ui/textinput";
 import { useState } from "react";
 import { Lock, Eye, EyeOff } from "lucide-react";
@@ -11,7 +11,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "./ui/dialog";
 import { motion } from "motion/react";
 
 export function SendCard() {
