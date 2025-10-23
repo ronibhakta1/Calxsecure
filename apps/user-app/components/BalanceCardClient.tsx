@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { BalanceCard } from "./BalanceCard";
+import { BalanceCard } from "../../../packages/ui/src/BalanceCard";
 
 export const BalanceCardClient = () => {
   const [balance, setBalance] = useState({ amount: 0, locked: 0 });

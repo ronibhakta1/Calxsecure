@@ -3,6 +3,7 @@ import db from "@repo/db/client";
 const app = express();
 
 app.use(express.json())
+
 app.post("/hdfcWebhook", async (req, res) => {
     const { token, amount } = req.body; // Real HDFC payload
     
@@ -24,7 +25,7 @@ app.post("/hdfcWebhook", async (req, res) => {
         console.log("Received webhook:", paymentInformation);
 
         const [balanceResult, transactionResult] = await db.$transaction([
-            db.balance.upsert({ // ✅ CREATE IF NO BALANCE
+            db.balance.upsert({ 
                 where: { userId: paymentInformation.userId },
                 update: { amount: { increment: paymentInformation.amount } },
                 create: { 

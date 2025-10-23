@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { OnRampTransactions } from "./OnRampTransactions";
+import { OnRampTransactions } from "../../../packages/ui/src/OnRampTransactions";
 
 export const OnRampTransactionsClient = () => {
   const [transactions, setTransactions] = useState([]);

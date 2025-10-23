@@ -5,7 +5,7 @@ import { TransferList } from "@/components/TransferList";
 import { OnRampList } from "@/components/OnRampList";
 import { StatsCards } from "@/components/StatsCards";
 import { DashboardClient } from "@/components/DashboardClient";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "../../../components/ui/avatar";
 import { Toaster } from "react-hot-toast";
 import { authOptions } from "@/app/lib/auth";
 import { startOfDay, subDays, format } from "date-fns";

@@ -1,6 +1,7 @@
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import Razorpay from "razorpay";
 import crypto from "crypto";
+import prisma from "@repo/db/client";
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID!,
@@ -8,15 +9,43 @@ const razorpay = new Razorpay({
 });
 
 export async function POST(req: NextRequest) {
-  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = await req.json();
-  
-  const shasum = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET!);
-  shasum.update(`${razorpay_order_id}|${razorpay_payment_id}`);
-  const digest = shasum.digest("hex");
+  const body = await req.json();
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body;
 
-  if (digest === razorpay_signature) {
-    // 🚨 Update Balance (call your updateBalance action)
-    return Response.json({ success: true });
+  const expectedSignature = crypto.createHmac("sha256", process.env.RAZORPAY_KEY_SECRET!)
+    .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+    .digest("hex");
+
+  if(expectedSignature !== razorpay_signature) {
+    return Response.json({ success: false , message: "Invalid signature" }, { status: 400 });
   }
-  return Response.json({ success: false }, { status: 400 });
+
+  const transaction = await prisma.onRampTransaction.findUnique({
+    where: { token: razorpay_order_id }
+  }); 
+
+  if(!transaction){
+    return NextResponse.json({ success :false , message : "Transaction not found" }, { status: 404 });
+  }
+
+  await prisma.onRampTransaction.update({
+    where:{id: transaction.id},
+    data:{ 
+      status: "Success",
+      transactionId: razorpay_payment_id 
+    }
+  })
+
+  await prisma.balance.upsert({
+    where:{userId: transaction.userId},
+    update:{
+      amount: { increment: transaction.amount }
+    },
+    create:{
+      userId: transaction.userId,
+      amount: transaction.amount,
+      locked: 0
+    }
+  })
+  return NextResponse.json({ success: true , message: "Payment verified and Balance updated" });
 }

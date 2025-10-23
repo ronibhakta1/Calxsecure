@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "./ui/card";
 
 export function StatsCards({ transfers, onRamps }: { transfers: any[]; onRamps: any[] }) {
   const totalSent = transfers.filter((t) => t.fromUserId).reduce((acc, t) => acc + t.amount, 0);

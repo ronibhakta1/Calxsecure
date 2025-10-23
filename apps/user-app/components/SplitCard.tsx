@@ -1,6 +1,6 @@
 "use client";
 import { Button } from "@repo/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { TextInput } from "@repo/ui/textinput";
 import { useState } from "react";
 import { createSplitRequests } from "@/app/lib/actions/createSplitRequests";

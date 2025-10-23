@@ -3,6 +3,6 @@
   "compilerOptions": {
     "outDir": "dist"
   },
-  "include": ["src"],
+  "include": ["src", "../../apps/user-app/components/BalanceCard.tsx", "../../apps/user-app/components/BalanceCardClient.tsx", "../../apps/user-app/components/BillPaymentCard.tsx", "../../apps/user-app/components/DashboardClient.tsx", "../../apps/user-app/components/Navbar.tsx", "../../apps/user-app/components/OnRampList.tsx", "../../apps/user-app/components/OnRampTransactions.tsx", "../../apps/user-app/components/OnRampTransactionsClient.tsx", "../../apps/user-app/components/P2PTransactionHistory.tsx", "../../apps/user-app/components/P2pTransationsHistory.tsx", "../../apps/user-app/components/RequestCard.tsx", "../../apps/user-app/components/SendCard.tsx", "../../apps/user-app/components/SidebarItem.tsx", "../../apps/user-app/components/SplitCard.tsx", "../../apps/user-app/components/StatsCards.tsx", "../../apps/user-app/components/TransactionsChart.tsx", "../../apps/user-app/components/TransferList.tsx", "../../apps/user-app/components/AddMoneyCard.tsx", "../../apps/user-app/components/AppbarClient.tsx"],
   "exclude": ["node_modules", "dist"]
 }
