@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 const prisma = new PrismaClient()
 
 async function main() {
-  // 🚨 NASIR
+  // 🚨 USERS
   const Nasir = await prisma.user.upsert({
     where: { number: '1111111111' },
     update: {},
@@ -31,7 +31,6 @@ async function main() {
     },
   })
 
-  // 🚨 VIKAS
   const Vikas = await prisma.user.upsert({
     where: { number: '2222222222' },
     update: {},
@@ -58,20 +57,63 @@ async function main() {
     },
   })
 
+  // 🚨 MERCHANTS
+  const merchants = await prisma.merchant.createMany({
+    data: [
+      {
+        email: "bses@merchant.com",
+        name: "BSES Rajdhani Power Ltd",
+        auth_type: "Google",
+      },
+      {
+        email: "delhijal@merchant.com",
+        name: "Delhi Jal Board",
+        auth_type: "Github",
+      },
+      {
+        email: "indane@merchant.com",
+        name: "Indane Gas",
+        auth_type: "Google",
+      },
+      {
+        email: "airtel@merchant.com",
+        name: "Airtel Payments",
+        auth_type: "Google",
+      },
+      {
+        email: "tatasky@merchant.com",
+        name: "Tata Sky DTH",
+        auth_type: "Github",
+      },
+      {
+        email: "tpddl@merchant.com",
+        name: "TPDDL Electricity",
+        auth_type: "Google",
+      },
+      {
+        email: "jio@merchant.com",
+        name: "Jio Recharge",
+        auth_type: "Github",
+      },
+    ],
+  });
+
+  const merchantList = await prisma.merchant.findMany();
+
   // 🚨 P2P Requests
   await prisma.p2PRequest.createMany({
     data: [
       {
         senderId: Nasir.id,
         receiverNumber: "2222222222",
-        amount: 500, // Already Int
+        amount: 500,
         message: "Dinner split",
         status: "PENDING",
       },
       {
         senderId: Vikas.id,
         receiverNumber: "1111111111",
-        amount: 200, 
+        amount: 200,
         message: "Movie ticket",
         status: "PENDING",
       },
@@ -96,20 +138,25 @@ async function main() {
     ],
   });
 
-  // 🚨 BillSchedules (amounts as Ints, multiplied by 100 if needed)
+  // 🚨 BILL SCHEDULES (with Merchant linking)
+  const findMerchant = (name: string) =>
+    merchantList.find((m) => m.name?.includes(name))?.id ?? null;
+
   await prisma.billSchedule.createMany({
     data: [
       {
         userId: Nasir.id,
+        merchantId: findMerchant("BSES"),
         billType: "ELECTRICITY",
         provider: "BSES Rajdhani",
         accountNo: "EL-123456789",
-        amount: 751, // Rounded from 750.50
+        amount: 751,
         dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
         nextPayment: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       },
       {
         userId: Nasir.id,
+        merchantId: findMerchant("Delhi Jal"),
         billType: "WATER",
         provider: "Delhi Jal Board",
         accountNo: "WB-987654321",
@@ -118,6 +165,7 @@ async function main() {
       },
       {
         userId: Nasir.id,
+        merchantId: findMerchant("Indane"),
         billType: "GAS",
         provider: "Indane Gas",
         accountNo: "GAS-456789123",
@@ -126,6 +174,7 @@ async function main() {
       },
       {
         userId: Nasir.id,
+        merchantId: findMerchant("Airtel"),
         billType: "PHONE_RECHARGE",
         provider: "Airtel",
         accountNo: "1111111111",
@@ -134,14 +183,16 @@ async function main() {
       },
       {
         userId: Nasir.id,
+        merchantId: findMerchant("Tata Sky"),
         billType: "DTH",
         provider: "Tata Sky",
         accountNo: "DTH-789123456",
-        amount: 451, // Rounded from 450.75
+        amount: 451,
         dueDate: new Date(Date.now() + 25 * 24 * 60 * 60 * 1000),
       },
       {
         userId: Vikas.id,
+        merchantId: findMerchant("TPDDL"),
         billType: "ELECTRICITY",
         provider: "TPDDL",
         accountNo: "EL-456789123",
@@ -150,6 +201,7 @@ async function main() {
       },
       {
         userId: Vikas.id,
+        merchantId: findMerchant("Jio"),
         billType: "PHONE_RECHARGE",
         provider: "Jio",
         accountNo: "2222222222",
@@ -159,20 +211,19 @@ async function main() {
     ],
   });
 
-  console.log(`✅ SEEDED DATA:
-📱 Nasir (PIN: 1234) - Balance: ₹20,000
-📱 Vikas (PIN: 5678) - Balance: ₹2,000
-🏦 2 OnRamp Transactions
-💸 2 P2P Transfers  
-📝 2 Pending Requests
-⚡ 7 Scheduled Bills
-🚀 READY!`)
+  console.log(`
+✅ SEEDED DATA:
+📱 Users: Nasir & Vikas
+🏦 Balances + OnRamp Transactions
+💳 Merchants: ${merchantList.length}
+🧾 BillSchedules: 7 linked to Merchants
+💸 P2P Transfers & Requests Created
+🚀 READY!
+  `);
 }
 
 main()
-  .then(async () => {
-    await prisma.$disconnect()
-  })
+  .then(async () => await prisma.$disconnect())
   .catch(async (e) => {
     console.error(e)
     await prisma.$disconnect()
