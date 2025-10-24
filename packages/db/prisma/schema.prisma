@@ -38,6 +38,7 @@ model Merchant {
   email     String   @unique
   name      String?
   auth_type AuthType
+  billSchedules BillSchedule[]
 }
 
 model OnRampTransaction {
@@ -73,6 +74,8 @@ model BillSchedule {
   id          Int      @id @default(autoincrement())
   userId      Int
   user        User     @relation(fields: [userId], references: [id])
+  merchantId  Int?
+  merchant    Merchant? @relation(fields: [merchantId], references: [id])
   billType    String   // 🚨 FIXED: String (not enum)
   provider    String
   accountNo   String
@@ -80,6 +83,9 @@ model BillSchedule {
   dueDate     DateTime
   nextPayment DateTime?
   createdAt   DateTime @default(now())
+  paymentMethod String @default("UPI")
+  status      String @default("PENDING")
+  token       String?   @unique
   
   @@map("bill_schedules")
 }
