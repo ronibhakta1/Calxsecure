@@ -5,7 +5,7 @@ const prisma  = new PrismaClient();
 
 export async function POST(request: Request) {
     try{
-        const {billId, status , token} = await request.json();
+        const {billId, status ,} = await request.json();
         const bill = await prisma.billSchedule.findUnique({
             where: { id: parseInt(billId) }
         });

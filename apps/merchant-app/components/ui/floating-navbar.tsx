@@ -1,7 +1,8 @@
 "use client";
 import React from "react";
 import { motion } from "motion/react";
-import { cn } from "@/lib/utils";
+import { cn } from "../../lib/utils";
+
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "../../../../packages/ui/src/avatar";
