@@ -21,6 +21,7 @@ model User {
   sentRequests      P2PRequest[]        @relation("P2PRequestSender")
   receivedRequests  P2PRequest[]       @relation("P2PRequestReceiver")
   billSchedules     BillSchedule[]
+  merchantPayments  MerchantPayment[]   @relation("UserMerchantPayments")
 }
 
 model p2pTransfer {
@@ -32,13 +33,28 @@ model p2pTransfer {
   toUserId   Int
   toUser     User         @relation(name: "ToUserRelation", fields: [toUserId], references: [id])
 }
-
 model Merchant {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String?
-  auth_type AuthType
-  billSchedules BillSchedule[]
+  id               Int               @id @default(autoincrement())
+  email            String            @unique
+  name             String?
+  upiId            String?           @unique // Add UPI ID for payments
+  auth_type        AuthType
+  billSchedules    BillSchedule[]
+  payments         MerchantPayment[] @relation("MerchantPayments")
+}
+
+model MerchantPayment {
+  id           Int      @id @default(autoincrement())
+  merchantId   Int
+  merchant     Merchant @relation("MerchantPayments", fields: [merchantId], references: [id])
+  qrId         String   @unique
+  amount       Int      // In paise
+  status       String   // PENDING, SUCCESS, FAILED
+  userId       Int?     // Optional, links to User who paid
+  user         User?    @relation("UserMerchantPayments", fields: [userId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  transactionId String?  @unique // UPI transaction ID
 }
 
 model OnRampTransaction {
@@ -51,7 +67,7 @@ model OnRampTransaction {
   transactionId String?      @unique // Bank transaction ID
   userId        Int
   user          User         @relation(fields: [userId], references: [id])
-  @@index([userId, startTime]) // Optimize queries
+  @@index([userId, startTime]) 
 }
 
 model P2PRequest {

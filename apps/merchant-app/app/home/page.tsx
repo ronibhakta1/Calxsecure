@@ -21,9 +21,8 @@ import vikas from '../../public/vikas.jpeg';
 const page = () => {
     const navItems = [
     { name: "Home", link: "/" },
-    { name: "Dashboard", link: "/dashboard" },
-    { name: "Transfer", link: "/transfer" },
-    { name: "P2P", link: "/p2p" },
+    { name: "Qr", link: "/qr" },
+    { name: "Bill", link: "/bill" },
     { name: "Settings", link: "/settings" },
   ];
 
