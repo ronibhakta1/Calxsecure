@@ -58,44 +58,55 @@ async function main() {
   })
 
   // 🚨 MERCHANTS
-  const merchants = await prisma.merchant.createMany({
-    data: [
-      {
-        email: "bses@merchant.com",
-        name: "BSES Rajdhani Power Ltd",
-        auth_type: "Google",
-      },
-      {
-        email: "delhijal@merchant.com",
-        name: "Delhi Jal Board",
-        auth_type: "Github",
-      },
-      {
-        email: "indane@merchant.com",
-        name: "Indane Gas",
-        auth_type: "Google",
-      },
-      {
-        email: "airtel@merchant.com",
-        name: "Airtel Payments",
-        auth_type: "Google",
-      },
-      {
-        email: "tatasky@merchant.com",
-        name: "Tata Sky DTH",
-        auth_type: "Github",
-      },
-      {
-        email: "tpddl@merchant.com",
-        name: "TPDDL Electricity",
-        auth_type: "Google",
-      },
-      {
-        email: "jio@merchant.com",
-        name: "Jio Recharge",
-        auth_type: "Github",
-      },
-    ],
+  const merchantsData = [
+    {
+      email: "bses@merchant.com",
+      name: "BSES Rajdhani Power Ltd",
+      upiId: "upi-bses-rajdhani",
+      auth_type: "Google",
+    },
+    {
+      email: "delhijal@merchant.com",
+      name: "Delhi Jal Board",
+      upiId: "upi-delhi-jal",
+      auth_type: "Github",
+    },
+    {
+      email: "indane@merchant.com",
+      name: "Indane Gas",
+      auth_type: "Google",
+      upiId: "upi-indane-gas",
+    },
+    {
+      email: "airtel@merchant.com",
+      name: "Airtel Payments",
+      auth_type: "Google",
+      upiId: "upi-airtel-payments",
+    },
+    {
+      email: "tatasky@merchant.com",
+      name: "Tata Sky DTH",
+      auth_type: "Github",
+      upiId: "upi-tata-sky",
+    },
+    {
+      email: "tpddl@merchant.com",
+      name: "TPDDL Electricity",
+      auth_type: "Google",
+      upiId: "upi-tpddl-electricity",
+    },
+    {
+      email: "jio@merchant.com",
+      name: "Jio Recharge",
+      auth_type: "Github",
+      upiId: "upi-jio-recharge",
+    },
+  ];
+
+  // Create merchants but skip duplicates when emails already exist
+  await prisma.merchant.createMany({
+    data: merchantsData,
+    skipDuplicates: true,
   });
 
   const merchantList = await prisma.merchant.findMany();
