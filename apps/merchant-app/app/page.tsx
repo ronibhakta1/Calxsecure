@@ -1,12 +1,16 @@
 "use client";
 
-import Link from "next/link";
+import { getServerSession } from "next-auth";
+import { redirect } from "next/navigation";
+import { authOptions } from "../lib/auth";
 
 
 
-export default function() {
-  
-  return <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-8 space-y-6" >
-    <Link className="bg-zinc-800 border border-zinc-700 text-white py-2 px-4 rounded" href="/bills">Schedule Payment</Link>
-  </div>
+export default async function() {
+  const session = await getServerSession(authOptions);
+  if (session?.user) {
+    redirect('/home')
+  } else {
+    redirect('/api/auth/signin')
+  }
 }

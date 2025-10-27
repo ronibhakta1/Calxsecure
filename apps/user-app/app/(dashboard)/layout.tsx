@@ -5,9 +5,9 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from '../../components/ui/avatar';
-import {  TooltipProvider, } from '../../components/ui/tooltip';
-import { Sidebar, SidebarBody, SidebarLink, SignupBtn } from '../../components/ui/sidebar';
+} from '../../../../packages/ui/src/avatar';
+import {  TooltipProvider, } from '../../../../packages/ui/src/tooltip';
+import { Sidebar, SidebarBody, SidebarLink, SignupBtn } from '../../../../packages/ui/src/sidebar';
 
 // Your Links Interface
 interface Links {

@@ -1,13 +1,14 @@
-import GoogleProvider from "next-auth/providers/google";
+
 import db from "@repo/db/client";
 import type { Account, Profile, User } from "next-auth";
 import type { AdapterUser } from "next-auth/adapters";
+import GitHubProvider from "next-auth/providers/github";
 
 export const authOptions = {
   providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID || "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET || ""
+    GitHubProvider({
+      clientId: process.env.GITHUB_CLIENT_ID || "",
+      clientSecret: process.env.GITHUB_CLIENT_SECRET || ""
     })
   ],
   callbacks: {
@@ -36,11 +37,11 @@ export const authOptions = {
         create: {
           email: user.email || "visible@gmail.com",
           name: user.name || "Visible",
-          auth_type: account?.provider === "google" ? "Google" : "Github",
+          auth_type: account?.provider === "github" ? "Github" : "Github",
         },
         update: {
           name: user.name || "Visible",
-          auth_type: account?.provider === "google" ? "Google" : "Github" // Use a prisma type here
+          auth_type: account?.provider === "github" ? "Github" : "Github" // Use a prisma type here
         }
       });
 

@@ -1,38 +1,25 @@
 "use client";
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
-import React from "react";
-import { motion } from "framer-motion";
-import { FloatingNav } from "../../components/ui/floating-navbar";
-import { ContainerTextFlip } from "../../components/ui/container-text-flip";
-import { HoverBorderGradient } from "../../components/ui/hover-border-gradient";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
-import { AnimatedTestimonials } from "@repo/ui/animated-testimonials";
-import roni from "@/public/roni.jpeg";
-import tan from "@/public/tan.jpeg";
-import nasir from "@/public/nasir.jpg";
-import vikas from "@/public/vikas.jpeg";
-import { FeaturesSectionDemo } from "../../components/ui/FeatureSection";
-import { ThreeDMarquee } from "../../../../packages/ui/src/3d-marquee";
-import pic1 from "@/public/pic1.844Z.png";
-import pic2 from "@/public/pic10.484Z.png";
-import pic3 from "@/public/pic11.447Z.png";
-import pic4 from "@/public/pic12.862Z.png";
-import pic5 from "@/public/pic3.825Z.png";
-import pic6 from "@/public/pic4.573Z.png";
-import pic7 from "@/public/pic5.812Z.png";
-import pic8 from "@/public/pic6.181Z.png";
-import pic9 from "@/public/pic7.950Z.png";
-import pic10 from "@/public/pic8.823Z.png";
-import pic11 from "@/public/pic9.290Z.png";
-import pic12 from "@/public/one.jpg";
-import pic13 from "@/public/four.png";
-import pic14 from "@/public/three.png";
-import pic15 from "@/public/two.png";
-import { PointerHighlight } from "../../components/ui/pointer-highlight";
+import React from 'react'
+import { FloatingNav } from '../../components/ui/floating-navbar';
+import { ContainerTextFlip } from '../../components/ui/container-text-flip';
+import { HoverBorderGradient } from '../../components/ui/hover-border-gradient';
+import { FeaturesSectionDemo } from '../../components/ui/FeatureSection';
+import { motion } from 'motion/react';
+import { AnimatedTestimonials } from '@repo/ui/animated-testimonials';
+import { PointerHighlight } from '../../components/ui/pointer-highlight';
 
-const Page = () => {
-  const navItems = [
+
+
+import roni from '../../public/roni.jpeg';
+import nasir from '../../public/nasir.jpg';
+import tan from '../../public/tan.jpeg';
+import vikas from '../../public/vikas.jpeg';
+
+const page = () => {
+    const navItems = [
     { name: "Home", link: "/" },
     { name: "Dashboard", link: "/dashboard" },
     { name: "Transfer", link: "/transfer" },
@@ -71,45 +58,7 @@ const Page = () => {
     },
   ];
 
-  const images = [
-    pic1.src,
-    pic10.src,
-    pic11.src,
-    pic13.src,
-    pic14.src,
-    pic15.src,
-    pic5.src,
-    pic12.src,
-    pic6.src,
-    pic7.src,
-    pic8.src,
-    pic9.src,
-    pic1.src,
-    pic10.src,
-    pic11.src,
-    pic4.src,
-    pic12.src,
-    pic11.src,
-    pic4.src,
-    pic13.src,
-    pic14.src,
-    pic15.src,
-    pic2.src,
-    pic3.src,
-    pic5.src,
-    pic6.src,
-    pic4.src,
-    pic12.src,
-    pic11.src,
-    pic4.src,
-    pic13.src,
-    pic14.src,
-    pic15.src,
-    pic2.src,
-    pic3.src,
-    pic5.src,
-    pic6.src,
-  ];
+ 
   const S1 = [
     {
       icon: "🔐",
@@ -135,9 +84,8 @@ const Page = () => {
 
   const { status } = useSession();
   const router = useRouter();
-
   return (
-    <div className="relative min-h-screen bg-zinc-950 dark:from-black dark:to-gray-900 overflow-hidden ">
+    <div className="selection:bg-zinc-500 selection:text-white relative min-h-screen bg-zinc-950 dark:from-black dark:to-gray-900 overflow-hidden ">
       {/* Floating Navbar */}
       <FloatingNav navItems={navItems} />
 
@@ -168,10 +116,7 @@ const Page = () => {
           </HoverBorderGradient>
         </div>
 
-        <ThreeDMarquee
-          className="pointer-events-none absolute h-full opacity-35 "
-          images={images}
-        />
+        
       </div>
 
       {/* Features Section */}
@@ -290,7 +235,7 @@ const Page = () => {
         <p>© 2025 CalxSecure. All rights reserved.</p>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Page;
+export default page
