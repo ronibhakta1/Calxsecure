@@ -9,6 +9,7 @@ import {
 import {  TooltipProvider, } from '../../../../packages/ui/src/tooltip';
 import { Sidebar, SidebarBody, SidebarLink, SignupBtn } from '../../../../packages/ui/src/sidebar';
 
+
 // Your Links Interface
 interface Links {
   label: string;
@@ -23,6 +24,7 @@ const sidebarLinks: Links[] = [
   { label: "P2P Transfer", href: "/p2p", icon: <Repeat className="w-5 h-5" /> },
   { label: "Bills", href: "/bills", icon: <BrickWallFire className="w-5 h-5" /> },
 ];
+  
 
 export default function Layout({
   children,
@@ -30,6 +32,7 @@ export default function Layout({
   children: React.ReactNode;
 }): JSX.Element {
   const { data: session } = useSession();
+
   return (
     <TooltipProvider>
       <div className="flex h-screen">

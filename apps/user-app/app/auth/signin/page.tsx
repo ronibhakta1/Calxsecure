@@ -18,7 +18,7 @@ export default function SignInPage() {
     await signIn("credentials", {
       phone,
       password,
-      callbackUrl: "/", // Redirect after successful login
+      callbackUrl: "/",
     });
   };
 
@@ -32,14 +32,14 @@ export default function SignInPage() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-1">
-                Phone Number
+                Number
               </label>
               <input
                 type="text"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 className="w-full p-2 border rounded-md  outline-none bg-zinc-700 "
-                placeholder="1234567890"
+                placeholder="Enter Number"
                 required
               />
             </div>
@@ -50,7 +50,7 @@ export default function SignInPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full p-2 border rounded-md  outline-none bg-zinc-700 "
-                placeholder="••••••••"
+                placeholder="Enter password"
                 required
               />
             </div>

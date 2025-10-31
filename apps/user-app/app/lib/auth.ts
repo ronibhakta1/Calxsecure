@@ -1,100 +1,113 @@
 import db from "@repo/db/client";
-import CredentialsProvider from "next-auth/providers/credentials"
+import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcrypt";
-import type { Session } from "next-auth";
+import { v4 as uuid } from "uuid";
+import type { AuthOptions } from "next-auth";
 import type { JWT } from "next-auth/jwt";
+import type { Session, User } from "next-auth";
 
 declare module "next-auth" {
+  interface User {
+    id: string;
+    name?: string | null;
+    number?: string;
+    sessionToken?: string;
+  }
+
   interface Session {
     user: {
       id?: string;
       name?: string | null;
-      email?: string | null;
-      image?: string | null;
-      number?: string; // 🚨 LINE 1: ADD THIS!
-    }
+      number?: string;
+      sessionToken?: string;
+    };
   }
 }
 
 declare module "next-auth/jwt" {
   interface JWT {
-    number?: string; // 🚨 LINE 2: ADD THIS!
+    number?: string;
+    sessionToken?: string;
   }
 }
 
-export const authOptions = {
-    providers: [
-      CredentialsProvider({
-          name: 'Credentials',
-          credentials: {
-            name:{label:"Name", type: "text", placeholder: "Nasir nadaf", required: false},
-            phone: { label: "Phone number", type: "text", placeholder: "1234567890", required: true },
-            password: { label: "Password", type: "password", required: true },
-          },
-          async authorize(credentials: any , req: any) {
-            console.log("Headers:", req.headers);
-            const hashedPassword = await bcrypt.hash(credentials.password, 10);
-            const existingUser = await db.user.findFirst({
-                where: {
-                    number: credentials.phone
-                }
-            });
-
-            if (existingUser) {
-                const passwordValidation = await bcrypt.compare(credentials.password, existingUser.password);
-                if (passwordValidation) {
-                    return {
-                        id: existingUser.id.toString(),
-                        name: existingUser.name,
-                        number: existingUser.number, // 🚨 LINE 3: ADD THIS!
-                        email: existingUser.number
-                    }
-                }
-                return null;
-            }
-
-            try {
-                const generatedPin = Math.floor(100000 + Math.random() * 900000).toString();
-                const user = await db.user.create({
-                    data: {
-                        number: credentials.phone,
-                        password: hashedPassword,
-                        userpin: generatedPin
-                    }
-                });
-            
-                return {
-                    id: user.id.toString(),
-                    name: user.name,
-                    number: user.number, // 🚨 LINE 4: ADD THIS!
-                    email: user.number
-                }
-            } catch(e) {
-                console.error(e);
-            }
-
-            return null
-          },
-        })
-    ],
-    secret: process.env.JWT_SECRET || "secret",
-    callbacks: {
-        async session({ session, token }: { session: Session; token: JWT }) {
-          if (session.user && token.sub) {
-            session.user.id = token.sub;
-            session.user.number = token.number; // 🚨 LINE 5: ADD THIS!
-          }
-          return session;
-        },
-        async jwt({ token, user }: { token: JWT; user?: { number?: string } | undefined }) {
-          if (user) {
-            token.number = user.number;
-          }
-          return token;
-        }
-    },
-    pages: {
-        signIn: '/auth/signin',
-        signUp: '/auth/signup',
-    },
+async function createNewSessionToken(userId: number) {
+  const newToken = uuid();
+  await db.user.update({
+    where: { id: userId },
+    data: { sessionToken: newToken },
+  });
+  return newToken;
 }
+
+export const authOptions: AuthOptions = {
+  providers: [
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        phone: { label: "Phone", type: "text", required: true },
+        password: { label: "Password", type: "password", required: true },
+      },
+
+      async authorize(credentials) {
+        const { phone, password } = credentials as any;
+
+        const user = await db.user.findUnique({
+          where: { number: phone },
+        });
+        if (!user) return null;
+
+        const ok = await bcrypt.compare(password, user.password);
+        if (!ok) return null;
+
+        const sessionToken = await createNewSessionToken(user.id);
+
+        return {
+          id: user.id.toString(),
+          name: user.name,
+          number: user.number,
+          sessionToken,
+        };
+      },
+    }),
+  ],
+
+  secret: process.env.NEXTAUTH_SECRET,
+
+  session: {
+    strategy: "jwt",
+  },
+
+  callbacks: {
+    async jwt({ token, user }: { token: JWT; user?: User }) {
+      if (user) {
+        token.number = user.number;
+        token.sessionToken = user.sessionToken;
+      }
+
+      if (token.number && token.sessionToken) {
+        const dbUser = await db.user.findUnique({
+          where: { number: token.number },
+          select: { sessionToken: true },
+        });
+
+        if (!dbUser || dbUser.sessionToken !== token.sessionToken) {
+          throw new Error("SESSION_EXPIRED_ANOTHER_DEVICE");
+        }
+      }
+
+      return token;
+    },
+
+    async session({ session, token }: { session: Session; token: JWT }) {
+      if (token.sub) session.user.id = token.sub;
+      if (token.number) session.user.number = token.number;
+      if (token.sessionToken) session.user.sessionToken = token.sessionToken;
+      return session;
+    },
+  },
+
+  pages: {
+    signIn: "/auth/signin",
+  },
+};

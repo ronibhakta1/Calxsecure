@@ -4,7 +4,6 @@ import { Inter } from "next/font/google";
 import { Providers } from "../provider";
 import QueryProvider from "../components/QueryProvider"; 
 
-
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -17,14 +16,14 @@ export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
-}): JSX.Element {
+}) {
   return (
     <html lang="en">
-      <Providers >
-        <body className={inter.className  }>
-          <QueryProvider>
-            {children}
-          </QueryProvider>
+      {/* ---- Session / Auth Provider (client) ---- */}
+      <Providers>
+        <body className={inter.className}>
+          {/* ---- React-Query Provider (client) ---- */}
+          <QueryProvider>{children}</QueryProvider>
         </body>
       </Providers>
     </html>

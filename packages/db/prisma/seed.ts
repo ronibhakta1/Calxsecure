@@ -1,5 +1,6 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, AuthType } from '@prisma/client'
 import bcrypt from "bcrypt";
+import { v4 as uuid } from "uuid";
 
 const prisma = new PrismaClient()
 
@@ -13,6 +14,7 @@ async function main() {
       password: await bcrypt.hash('Nasir', 10),
       userpin: '1234',
       name: 'Nasir',
+      sessionToken:uuid(),
       Balance: {
         create: {
           amount: 20000,
@@ -39,6 +41,7 @@ async function main() {
       password: await bcrypt.hash('Vikas', 10),
       userpin: '5678',
       name: 'Vikas',
+      sessionToken:uuid(),
       Balance: {
         create: {
           amount: 2000,
@@ -63,42 +66,42 @@ async function main() {
       email: "bses@merchant.com",
       name: "BSES Rajdhani Power Ltd",
       upiId: "upi-bses-rajdhani",
-      auth_type: "Google",
+      auth_type: AuthType.Google,
     },
     {
       email: "delhijal@merchant.com",
       name: "Delhi Jal Board",
       upiId: "upi-delhi-jal",
-      auth_type: "Github",
+      auth_type: AuthType.Github,
     },
     {
       email: "indane@merchant.com",
       name: "Indane Gas",
-      auth_type: "Google",
+      auth_type: AuthType.Google,
       upiId: "upi-indane-gas",
     },
     {
       email: "airtel@merchant.com",
       name: "Airtel Payments",
-      auth_type: "Google",
+      auth_type: AuthType.Google,
       upiId: "upi-airtel-payments",
     },
     {
       email: "tatasky@merchant.com",
       name: "Tata Sky DTH",
-      auth_type: "Github",
+      auth_type: AuthType.Github,
       upiId: "upi-tata-sky",
     },
     {
       email: "tpddl@merchant.com",
       name: "TPDDL Electricity",
-      auth_type: "Google",
+      auth_type: AuthType.Google,
       upiId: "upi-tpddl-electricity",
     },
     {
       email: "jio@merchant.com",
       name: "Jio Recharge",
-      auth_type: "Github",
+      auth_type: AuthType.Github,
       upiId: "upi-jio-recharge",
     },
   ];
