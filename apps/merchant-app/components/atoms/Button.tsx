@@ -1,9 +1,11 @@
 import { cn } from "../../lib/utils";
 import { Loader2, Check } from "lucide-react";
-import { ButtonHTMLAttributes } from "react";
-import { motion } from "framer-motion";
+import { motion, HTMLMotionProps } from "framer-motion";
 
-interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
+import { ReactNode } from "react";
+
+interface Props extends Omit<HTMLMotionProps<"button">, "ref" | "children"> {
+  children?: ReactNode;
   loading?: boolean;
   success?: boolean;
   variant?: "primary" | "secondary";
