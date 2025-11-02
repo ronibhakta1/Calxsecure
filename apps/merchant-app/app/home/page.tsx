@@ -108,7 +108,7 @@ const page = () => {
               </button>
             )}
             {status === "unauthenticated" && (
-              <button onClick={() => router.push("/auth/signup")}>
+              <button onClick={() => router.push("/auth/signin")}>
                 Get Started
               </button>
             )}
