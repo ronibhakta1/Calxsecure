@@ -13,7 +13,11 @@ model User {
   name              String?
   number            String              @unique
   password          String
-  userpin          String
+  sessionToken      String?
+  image             String?
+  userpin           String
+  resetOtp          String?
+  resetExpires      DateTime?
   OnRampTransaction OnRampTransaction[]
   Balance           Balance[]
   sentTransfers     p2pTransfer[]       @relation(name: "FromUserRelation")

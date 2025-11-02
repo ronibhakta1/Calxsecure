@@ -156,4 +156,9 @@ app.post("/webhook/qr-payment", async (req, res) => {
   }
 });
 
-app.listen(3003, () => console.log("Webhook backend running on port 3003"));
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
+const PORT = process.env.PORT || 3002;
+app.listen(PORT, () => console.log(`Webhook backend running on port ${PORT}`));

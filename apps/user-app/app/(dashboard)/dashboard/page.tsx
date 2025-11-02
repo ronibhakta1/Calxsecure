@@ -91,7 +91,7 @@ export default async function DashboardPage() {
         {/* User Greeting */}
         <div className="flex items-center space-x-4">
           <Avatar>
-            <AvatarImage src={session?.user?.image || "https://github.com/shadcn.png"} />
+            <AvatarImage src={"https://github.com/shadcn.png"} />
             <AvatarFallback>{session.user.name?.[0] || "U"}</AvatarFallback>
           </Avatar>
           <h1 className="text-2xl font-semibold text-zinc-100">

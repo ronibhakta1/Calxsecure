@@ -22,7 +22,7 @@ const page = () => {
     const navItems = [
     { name: "Home", link: "/" },
     { name: "Qr", link: "/qr" },
-    { name: "Bill", link: "/bill" },
+    { name: "Bill", link: "/bills" },
     { name: "Settings", link: "/settings" },
   ];
 
@@ -103,8 +103,8 @@ const page = () => {
           </p>
           <HoverBorderGradient>
             {status === "authenticated" && (
-              <button onClick={() => router.push("/dashboard")}>
-                Go to Dashboard
+              <button onClick={() => router.push("/qr")}>
+                Generate QR Code
               </button>
             )}
             {status === "unauthenticated" && (
@@ -216,8 +216,8 @@ const page = () => {
           </p>
           <HoverBorderGradient >
             {status === "authenticated" && (
-              <button onClick={() => router.push("/dashboard")}>
-                Go to Dashboard
+              <button onClick={() => router.push("/qr")}>
+                Generate QR Code
               </button>
             )}
             {status === "unauthenticated" && (

@@ -36,9 +36,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: `Merchant not found for email: ${session.user.email}` }, { status: 404 });
     }
 
-    const upiId = merchant.upiId && merchant.upiId.length <= 20 ? merchant.upiId : merchant.email.slice(0, 20);
+    const upiId = "7822952595@ibl";
     const merchantName = merchant.name && merchant.name.length <= 15 ? merchant.name : "Merchant";
-    const qrId = generateShortId(); // Short 10-char ID
+    const qrId = generateShortId(); 
 
     const upiUri = `upi://pay?pa=${encodeURIComponent(upiId)}&pn=${encodeURIComponent(
       merchantName

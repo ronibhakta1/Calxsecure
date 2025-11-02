@@ -9,6 +9,7 @@ import {
 import {  TooltipProvider, } from '../../../../packages/ui/src/tooltip';
 import { Sidebar, SidebarBody, SidebarLink, SignupBtn } from '../../../../packages/ui/src/sidebar';
 
+
 // Your Links Interface
 interface Links {
   label: string;
@@ -23,6 +24,7 @@ const sidebarLinks: Links[] = [
   { label: "P2P Transfer", href: "/p2p", icon: <Repeat className="w-5 h-5" /> },
   { label: "Bills", href: "/bills", icon: <BrickWallFire className="w-5 h-5" /> },
 ];
+  
 
 export default function Layout({
   children,
@@ -30,6 +32,7 @@ export default function Layout({
   children: React.ReactNode;
 }): JSX.Element {
   const { data: session } = useSession();
+
   return (
     <TooltipProvider>
       <div className="flex h-screen">
@@ -44,7 +47,7 @@ export default function Layout({
             <div className=" border-t border-neutral-200 dark:border-neutral-700">
               <div className="flex items-center gap-3">
                 <Avatar className="h-8 w-8 ">
-                  <AvatarImage src={session?.user?.image ?? undefined} alt="@user" />
+                  <AvatarImage src={undefined} alt="@user" />
                   <AvatarFallback>{session?.user?.name?.[0] || "US"}</AvatarFallback>
                 </Avatar>
                 
@@ -53,7 +56,7 @@ export default function Layout({
                     {session?.user?.name || "Nasir Nadaf"}
                   </p>
                   <p className="text-xs text-neutral-400 truncate">
-                    {session?.user?.email || "nasir@gmail.com"}
+                    {session?.user?.number || "+1234567890"}
                   </p>
                 </div>
 
