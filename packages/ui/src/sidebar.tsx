@@ -202,7 +202,7 @@ export const SignupBtn = () => {
    const handleLogout = async () => {
       try {
         await signOut({ redirect: false });
-        router.push("/auth/signup");
+        router.push("/auth/signin");
       } catch (error) {
         console.error("Logout failed:", error);
       }

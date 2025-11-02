@@ -6,9 +6,9 @@ import prisma from "@repo/db/client";
 export async function POST(request: Request) {
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      console.error("No session or email found");
-      return NextResponse.json({ error: "Unauthorized: No email in session" }, { status: 401 });
+    if (!session?.user?.id) {
+      console.error("No session or user ID found");
+      return NextResponse.json({ error: "Unauthorized: No user in session" }, { status: 401 });
     }
 
     const { qrId, amount, transactionId } = await request.json();
@@ -18,9 +18,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "UPI Transaction ID required" }, { status: 400 });
     }
 
-    const user = await prisma.user.findUnique({ where: { email: session.user.email } });
+    const user = await prisma.user.findUnique({ where: { id: Number(session.user.id) } });
     if (!user) {
-      console.error(`User not found for email: ${session.user.email}`);
+      console.error(`User not found for id: ${session.user.id}`);
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 

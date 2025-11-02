@@ -71,7 +71,7 @@ export const FloatingNav = ({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Avatar className="cursor-pointer"> 
-                  <AvatarImage src={session?.user?.image || "https://github.com/shadcn.png"} alt="@user" />
+                  <AvatarImage src={  "https://github.com/shadcn.png"} alt="@user" />
                   <AvatarFallback>{session?.user?.name?.[0] || "US"}</AvatarFallback>
                 </Avatar>
             </DropdownMenuTrigger>

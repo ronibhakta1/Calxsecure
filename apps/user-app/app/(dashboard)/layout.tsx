@@ -47,7 +47,7 @@ export default function Layout({
             <div className=" border-t border-neutral-200 dark:border-neutral-700">
               <div className="flex items-center gap-3">
                 <Avatar className="h-8 w-8 ">
-                  <AvatarImage src={session?.user?.image ?? undefined} alt="@user" />
+                  <AvatarImage src={undefined} alt="@user" />
                   <AvatarFallback>{session?.user?.name?.[0] || "US"}</AvatarFallback>
                 </Avatar>
                 
@@ -56,7 +56,7 @@ export default function Layout({
                     {session?.user?.name || "Nasir Nadaf"}
                   </p>
                   <p className="text-xs text-neutral-400 truncate">
-                    {session?.user?.email || "nasir@gmail.com"}
+                    {session?.user?.number || "+1234567890"}
                   </p>
                 </div>
 

@@ -49,8 +49,7 @@ export async function POST(req: NextRequest) {
     await prisma.onRampTransaction.update({
       where: { id: transaction.id },
       data: {
-        status: "Success",
-        paymentId: razorpay_payment_id, // store Razorpay payment ID
+        status: "Success"
       },
     });
 

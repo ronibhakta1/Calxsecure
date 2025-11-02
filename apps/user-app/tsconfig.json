@@ -18,8 +18,27 @@
     "next.config.js",
     "**/*.ts",
     "**/*.tsx",
-    ".next/types/**/*.ts"
-, "components/AddMoneyCard.tsx", "components/ui/FeatureSection.tsx", "../../packages/ui/src/animated-testimonials.tsx", "../../packages/ui/src/3d-marquee.tsx", "../../packages/ui/src/avatar.tsx", "../../packages/ui/src/background-boxes.tsx", "../../packages/ui/src/tooltip.tsx", "components/ui/toaster.tsx", "../../packages/ui/src/toast.tsx", "../../packages/ui/src/text-hover-effect.tsx", "../../packages/ui/src/tabs.tsx", "../../packages/ui/src/table.tsx", "components/ui/switch.tsx", "../../packages/ui/src/skeleton.tsx", "../../packages/ui/src/sidebar.tsx", "../../packages/ui/src/separator.tsx", "../../packages/ui/src/label.tsx", "components/ui/input.tsx", "../../packages/ui/src/layout-text-flip.tsx"  ],
+    ".next/types/**/*.ts",
+    "components/AddMoneyCard.tsx",
+    "components/ui/FeatureSection.tsx",
+    "../../packages/ui/src/animated-testimonials.tsx",
+    "../../packages/ui/src/3d-marquee.tsx",
+    "../../packages/ui/src/avatar.tsx",
+    "../../packages/ui/src/background-boxes.tsx",
+    "../../packages/ui/src/tooltip.tsx",
+    "components/ui/toaster.tsx",
+    "../../packages/ui/src/toast.tsx",
+    "../../packages/ui/src/text-hover-effect.tsx",
+    "../../packages/ui/src/tabs.tsx",
+    "../../packages/ui/src/table.tsx",
+    "components/ui/switch.tsx",
+    "../../packages/ui/src/skeleton.tsx",
+    "../../packages/ui/src/sidebar.tsx",
+    "../../packages/ui/src/separator.tsx",
+    "../../packages/ui/src/label.tsx",
+    "components/ui/input.tsx",
+    "../../packages/ui/src/layout-text-flip.tsx"
+  ],
   "exclude": [
     "node_modules"
   ]

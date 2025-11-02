@@ -8,9 +8,9 @@ export async function POST(request: Request) {
   let qrCodeUrl: string | undefined;
   try {
     const session = await getServerSession(authOptions);
-    if (!session?.user?.email) {
-      console.error("No session or email found");
-      return NextResponse.json({ error: "Unauthorized: No email in session" }, { status: 401 });
+    if (!session?.user?.id) {
+      console.error("No session or user ID found");
+      return NextResponse.json({ error: "Unauthorized: No user in session" }, { status: 401 });
     }
 
     const { qrCodeUrl } = await request.json();

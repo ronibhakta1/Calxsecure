@@ -5,6 +5,9 @@ import { v4 as uuid } from "uuid";
 import type { AuthOptions } from "next-auth";
 import type { JWT } from "next-auth/jwt";
 import type { Session, User } from "next-auth";
+import redis from "@/lib/redis";
+
+const SESSION_TTL = 30 * 24 * 60 * 60; // 30 days in seconds
 
 declare module "next-auth" {
   interface User {
@@ -49,8 +52,24 @@ export const authOptions: AuthOptions = {
         password: { label: "Password", type: "password", required: true },
       },
 
-      async authorize(credentials) {
-        const { phone, password } = credentials as any;
+      async authorize(
+        credentials: { phone: string; password: string } | undefined
+      ) {
+        const { phone, password } = credentials as {
+          phone: string;
+          password: string;
+        };
+
+        const rateKey = `rate_limit:phone:${phone}`;
+        const attempts = await redis.incr(rateKey);
+        if (attempts === 1) {
+          await redis.expire(rateKey, 60); // 1 minute window
+        }
+        if (attempts > 5) {
+          throw new Error(
+            "Too many login attempts. Please try again in 1 minute."
+          );
+        }
 
         const user = await db.user.findUnique({
           where: { number: phone },
@@ -58,9 +77,24 @@ export const authOptions: AuthOptions = {
         if (!user) return null;
 
         const ok = await bcrypt.compare(password, user.password);
-        if (!ok) return null;
+        if (!ok) {
+          const remaining = 5 - attempts;
+          if (remaining > 0) {
+            throw new Error(
+              `Invalid credentials. ${remaining} attempt(s) left.`
+            );
+          } else {
+            throw new Error("Too many login attempts. Try again in 1 minute.");
+          }
+        }
+        await redis.del(rateKey); // reset on successful login
 
-        const sessionToken = await createNewSessionToken(user.id);
+        const sessionToken = uuid();
+        await db.user.update({
+          where: { id: user.id },
+          data: { sessionToken },
+        });
+        await redis.setex(`session:phone:${phone}`, SESSION_TTL, sessionToken);
 
         return {
           id: user.id.toString(),
@@ -85,15 +119,26 @@ export const authOptions: AuthOptions = {
         token.sessionToken = user.sessionToken;
       }
 
-      if (token.number && token.sessionToken) {
+      if (!token.number) return token;
+
+      const cacheKey = `session:phone:${token.number}`;
+      const cachedToken = await redis.get(cacheKey);
+
+      if (cachedToken && cachedToken !== token.sessionToken) {
+        throw new Error("SESSION_EXPIRED_ANOTHER_DEVICE");
+      }
+
+      if (!cachedToken) {
         const dbUser = await db.user.findUnique({
           where: { number: token.number },
           select: { sessionToken: true },
         });
 
-        if (!dbUser || dbUser.sessionToken !== token.sessionToken) {
-          throw new Error("SESSION_EXPIRED_ANOTHER_DEVICE");
+        if (!dbUser) {
+          throw new Error("USER_NOT_FOUND");
         }
+        // repopulate cache
+        await redis.setex(cacheKey, SESSION_TTL, dbUser.sessionToken!);
       }
 
       return token;

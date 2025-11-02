@@ -3,8 +3,6 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Providers } from "../provider";
-import logo from '@/public/logo.png'
-
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -12,10 +10,9 @@ export const metadata: Metadata = {
   title: "CalxSecure",
   description: "payment app",
   keywords: ["payments", "security", "fintech"],
-  icons:{
-    icon: logo.src
-  }
-
+  icons: {
+    icon: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
