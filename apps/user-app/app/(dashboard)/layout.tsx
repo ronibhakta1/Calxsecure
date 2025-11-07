@@ -1,6 +1,6 @@
 "use client";
 import { useSession } from "next-auth/react";
-import { BrickWallFire, Home, LayoutDashboard, Repeat, Send,} from 'lucide-react';
+import { BrickWallFire, Home, LayoutDashboard, Repeat, Send, Wallet,} from 'lucide-react';
 import {
   Avatar,
   AvatarFallback,
@@ -23,6 +23,7 @@ const sidebarLinks: Links[] = [
   { label: "Transfer", href: "/transfer", icon: <Send className="w-5 h-5" /> },
   { label: "P2P Transfer", href: "/p2p", icon: <Repeat className="w-5 h-5" /> },
   { label: "Bills", href: "/bills", icon: <BrickWallFire className="w-5 h-5" /> },
+  { label: "Recharge", href: "/recharge", icon: <Wallet className="w-5 h-5" /> },
 ];
   
 
