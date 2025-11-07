@@ -47,7 +47,7 @@ export const AnimatedTestimonials = ({
   if (testimonials.length === 0) return null;
 
   return (
-    <div className="mx-auto max-w-sm  dark:text-zinc-300 px-4 py-20 font-sans antialiased md:max-w-4xl md:px-8 lg:px-12">
+    <div className="mx-auto max-w-sm px-4 py-20 font-sans antialiased md:max-w-4xl md:px-8 lg:px-12">
       <div className="relative grid grid-cols-1 gap-20 md:grid-cols-2">
         <div>
           <div className="relative h-80 w-full">
@@ -96,7 +96,7 @@ export const AnimatedTestimonials = ({
             </AnimatePresence>
           </div>
         </div>
-        <div className="flex flex-col justify-between py-4 text-zinc-900 dark:text-gray-300">
+        <div className="flex flex-col justify-between py-4">
           <motion.div
             key={active}
             initial={{
@@ -116,13 +116,13 @@ export const AnimatedTestimonials = ({
               ease: "easeInOut",
             }}
           >
-            <h3 className="text-2xl font-bold text-zinc-900 dark:text-white">
+            <h3 className="text-2xl font-bold text-white dark:text-white">
               {testimonials[active]?.name ?? ""}
             </h3>
-            <p className="text-sm text-gray-400 dark:text-neutral-500">
+            <p className="text-sm text-gray-200 dark:text-neutral-500">
               {testimonials[active]?.designation ?? ""}
             </p>
-            <motion.p className="mt-8 text-lg text-gray-900 dark:text-neutral-300">
+            <motion.p className="mt-8 text-lg text-gray-100 dark:text-neutral-300">
               {(testimonials[active]?.description ?? "")
                 .split(" ")
                 .filter(Boolean)
