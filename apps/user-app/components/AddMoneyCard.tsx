@@ -37,6 +37,7 @@ import {
   DialogTrigger,
 } from "./ui/dialog";
 import { motion } from "motion/react";
+import { HoverBorderGradient } from "./ui/hover-border-gradient";
 
 const SUPPORTED_BANKS = [
   { name: "HDFC Bank", redirectUrl: "https://netbanking.hdfcbank.com" },
@@ -127,10 +128,10 @@ interface LoadingStateProps {
 
 // Success Card Component
 const SuccessCard: React.FC<SuccessCardProps> = ({ amount, paymentMethod, onViewBalance }) => (
-  <Card className="border bg-zinc-800 shadow-sm">
+  <Card className="border-t  shadow-sm">
     <CardHeader className="text-center">
       <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-      <CardTitle className="text-xl text-zinc-100">₹{amount} Added!</CardTitle>
+      <CardTitle className="text-xl ">₹{amount} Added!</CardTitle>
     </CardHeader>
     <CardContent className="text-center">
       <p className="text-zinc-400">
@@ -138,7 +139,7 @@ const SuccessCard: React.FC<SuccessCardProps> = ({ amount, paymentMethod, onView
       </p>
     </CardContent>
     <CardFooter>
-      <Button onClick={onViewBalance} className="w-full">
+      <Button onClick={onViewBalance} className="w-full bg-zinc-400 hover:bg-zinc-500">
         View Balance
       </Button>
     </CardFooter>
@@ -163,13 +164,13 @@ const AmountInput: React.FC<AmountInputProps> = ({ amount, setAmount, amountErro
     <div>
       <TextInput
         label="Amount"
-        className={`text-zinc-100 ${isInvalid ? "border-red-500" : ""}`}
+        className={` ${isInvalid ? "border-red-500" : ""}`}
         placeholder="Enter amount"
         onChange={handleAmountChange}
         type="number"
       />
       {amountError && (
-        <div className="mt-2 border border-red-500 rounded-md p-2 bg-zinc-800">
+        <div className="mt-2 border border-red-500 rounded-md p-2 ">
           <p className="text-red-500 text-sm">{amountError}</p>
         </div>
       )}
@@ -189,15 +190,15 @@ const PaymentMethodSelector: React.FC<PaymentMethodSelectorProps> = ({ paymentMe
   );
 
   return (
-    <div>
-      <label className="text-sm font-medium text-zinc-50 mb-2 block">Payment Method</label>
+    <div >
+      <label className="text-sm font-medium mb-2 block ">Payment Method</label>
       <Select value={paymentMethod.value} onValueChange={handlePaymentMethodChange}>
-        <SelectTrigger className="border-zinc-100 bg-zinc-500 text-zinc-100">
+        <SelectTrigger className="border-zinc-100 bg-zinc-400 dark:bg-zinc-700">
           <SelectValue />
         </SelectTrigger>
-        <SelectContent className="bg-zinc-500 text-zinc-100">
+        <SelectContent className="bg-zinc-400 dark:bg-zinc-700 ">
           {PAYMENT_METHODS.map((method) => (
-            <SelectItem key={method.value} value={method.value} className="flex divide-y w-full items-center">
+            <SelectItem key={method.value} value={method.value} className="flex divide-y w-full items-center hover:bg-zinc-400 dark:hover:bg-zinc-600 dark:text-zinc-100">
               <div className="flex items-center gap-2 p-2">
                 <span>{method.icon}</span> <span>{method.label}</span>
               </div>
@@ -222,14 +223,14 @@ const BankSelector: React.FC<BankSelectorProps> = ({ provider, setProvider, setR
 
   return (
     <div className="space-y-2">
-      <label className="text-sm font-medium text-zinc-50">Select Bank</label>
+      <label className="text-sm font-medium ">Select Bank</label>
       <Select onValueChange={handleBankChange} value={provider}>
-        <SelectTrigger className={`border-zinc-100 bg-zinc-500 text-zinc-100 ${!provider ? "border-red-500" : ""}`}>
+        <SelectTrigger className={`border-zinc-100 bg-zinc-400 dark:bg-zinc-700 ${!provider ? "border-red-500" : ""}`}>
           <SelectValue placeholder="Select a bank" />
         </SelectTrigger>
-        <SelectContent className="bg-zinc-500 text-zinc-100">
+        <SelectContent className="bg-zinc-400 dark:bg-zinc-700 ">
           {SUPPORTED_BANKS.map((bank) => (
-            <SelectItem key={bank.name} value={bank.name}>{bank.name}</SelectItem>
+            <SelectItem className="hover:bg-zinc-400 dark:hover:bg-zinc-600 dark:text-zinc-100" key={bank.name} value={bank.name}>{bank.name}</SelectItem>
           ))}
         </SelectContent>
       </Select>
@@ -319,19 +320,19 @@ const CardDetails: React.FC<CardDetailsProps> = ({
     <motion.div
       initial={{ opacity: 0, height: 0 }}
       animate={{ opacity: 1, height: "auto" }}
-      className="space-y-3 overflow-hidden transition-all duration-300 text-zinc-100"
+      className="space-y-3 overflow-hidden transition-all duration-300 "
     >
       <div>
         <TextInput
           label="Card Number"
           required={true}
-          placeholder="4111 1111 1111 1111"
+          placeholder="4111 1111 **** ****"
           type="number"
           onChange={handleCardNumberChange}
           className={cardNumberLocalInvalid ? "border-red-500" : ""}
         />
         {cardNumberError && (
-          <div className="mt-2 border border-red-500 rounded-md p-2 bg-zinc-800">
+          <div className="mt-2 border border-red-500 rounded-md p-2 ">
             <p className="text-red-500 text-sm">{cardNumberError}</p>
           </div>
         )}
@@ -346,7 +347,7 @@ const CardDetails: React.FC<CardDetailsProps> = ({
             className={expiryLocalInvalid ? "border-red-500" : ""}
           />
           {expiryError && (
-            <div className="mt-2 border border-red-500 rounded-md p-2 bg-zinc-800">
+            <div className="mt-2 border border-red-500 rounded-md p-2 ">
               <p className="text-red-500 text-sm">{expiryError}</p>
             </div>
           )}
@@ -361,7 +362,7 @@ const CardDetails: React.FC<CardDetailsProps> = ({
             className={cvvLocalInvalid ? "border-red-500" : ""}
           />
           {cvvError && (
-            <div className="mt-2 border border-red-500 rounded-md p-2 bg-zinc-800">
+            <div className="mt-2 border border-red-500 rounded-md p-2 ">
               <p className="text-red-500 text-sm">{cvvError}</p>
             </div>
           )}
@@ -370,13 +371,13 @@ const CardDetails: React.FC<CardDetailsProps> = ({
       <div>
         <TextInput
           label="Name on Card"
-          placeholder="vikas budhyal"
+          placeholder="Enter your Name"
           onChange={handleCardNameChange}
           required={true}
           className={cardNameLocalInvalid ? "border-red-500" : ""}
         />
         {cardNameError && (
-          <div className="mt-2 border border-red-500 rounded-md p-2 bg-zinc-800">
+          <div className="mt-2 border border-red-500 rounded-md p-2 ">
             <p className="text-red-500 text-sm">{cardNameError}</p>
           </div>
         )}
@@ -426,9 +427,13 @@ const PinDialog: React.FC<PinDialogProps> = ({
         className="flex w-full items-center"
         disabled={!isFormValid}
       >
-        <Button className="bg-zinc-600 hover:bg-zinc-500 disabled:bg-zinc-600/50 disabled:cursor-not-allowed">
-          Add ₹{amount || 0} via {paymentMethod.label}
-        </Button>
+        <HoverBorderGradient>
+          <button className=" disabled:bg-zinc-600/50 disabled:cursor-not-allowed">
+            Add via {paymentMethod.label}
+          </button>
+
+        </HoverBorderGradient>
+        
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
@@ -449,18 +454,18 @@ const PinDialog: React.FC<PinDialogProps> = ({
               onChange={handlePinChange}
               placeholder="••••"
               maxLength={4}
-              className={`w-full text-center text-2xl tracking-widest font-mono bg-zinc-700 border border-zinc-600 rounded-md p-3 text-zinc-100 ${pinInvalid ? "border-red-500" : ""}`}
+              className={`w-full text-center text-2xl tracking-widest font-mono  border border-zinc-600 rounded-md p-3 ${pinInvalid ? "border-red-500" : ""}`}
             />
             <button
               type="button"
               onClick={() => setShowPin(!showPin)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400"
+              className="absolute right-3 top-1/2 -translate-y-1/2 "
             >
               {showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
           {pinError && (
-            <div className="mt-2 border border-red-500 rounded-md p-2 bg-zinc-800">
+            <div className="mt-2 border border-red-500 rounded-md p-2">
               <p className="text-red-500 text-sm">{pinError}</p>
             </div>
           )}
@@ -473,7 +478,7 @@ const PinDialog: React.FC<PinDialogProps> = ({
               handlePinConfirm();
             }}
             disabled={pin.length !== 4}
-            className="w-full"
+            className="w-full bg-zinc-400 hover:bg-zinc-500"
           >
             Confirm ₹{amount} Add
           </Button>
@@ -486,8 +491,8 @@ const PinDialog: React.FC<PinDialogProps> = ({
 // Loading State Component
 const LoadingState: React.FC<LoadingStateProps> = ({ status, paymentMethod }) => (
   <div className="text-center space-y-4">
-    <Loader2 className="w-8 h-8 animate-spin text-zinc-500 mx-auto" />
-    <p className="text-zinc-400">
+    <Loader2 className="w-8 h-8 animate-spin mx-auto" />
+    <p className="">
       {status === "loading" ? "Creating transaction..." : `Processing ${paymentMethod.label} payment...`}
     </p>
   </div>
@@ -681,10 +686,10 @@ export const AddMoney: React.FC<AddMoneyProps> = ({ userpin }) => {
   }
 
   return (
-    <Card className="border bg-zinc-700 shadow-sm">
+    <Card className="shadow-md  ">
       <CardHeader>
-        <CardTitle className="text-xl text-zinc-100">Add Money</CardTitle>
-        <CardDescription className="text-zinc-50">
+        <CardTitle className="text-xl ">Add Money</CardTitle>
+        <CardDescription className="text-zinc-400">
           Securely add funds via {paymentMethod.label}
         </CardDescription>
       </CardHeader>
@@ -730,7 +735,7 @@ export const AddMoney: React.FC<AddMoneyProps> = ({ userpin }) => {
               />
             )}
             {paymentError && (
-              <div className="mt-2 border border-red-500 rounded-md p-2 bg-zinc-800">
+              <div className="mt-2 border border-red-500 rounded-md p-2 ">
                 <p className="text-red-500 text-sm">{paymentError}</p>
               </div>
             )}

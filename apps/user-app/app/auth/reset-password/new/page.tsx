@@ -54,10 +54,10 @@ const page = () => {
     }
   };
   return (
-    <div className="flex items-center justify-center min-h-screen bg-zinc-900 p-4">
+    <div className="flex items-center justify-center min-h-screen  p-4">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-md space-y-4 bg-zinc-800 p-6 rounded-lg text-white"
+        className="w-full max-w-md space-y-4 p-6 rounded-lg "
       >
         <h2 className="text-xl font-bold text-center">Set New Password</h2>
         <input
@@ -65,7 +65,7 @@ const page = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="New password"
-          className="w-full p-3 bg-zinc-700 rounded-md"
+          className="w-full p-3  rounded-md"
           required
         />
         <input
@@ -73,14 +73,14 @@ const page = () => {
           value={confirm}
           onChange={(e) => setConfirm(e.target.value)}
           placeholder="Confirm password"
-          className="w-full p-3 bg-zinc-700 rounded-md"
+          className="w-full p-3 rounded-md"
           required
         />
         {error && <p className="text-red-500 text-sm">{error}</p>}
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-zinc-500 py-2 rounded-md hover:bg-zinc-600 disabled:opacity-50"
+          className="w-full bg-zinc-400 py-2 rounded-md hover:bg-zinc-500 disabled:opacity-50 dark:bg-zinc-600 dark:hover:bg-zinc-700 "
         >
           {loading ? "Updating..." : "Update Password"}
         </button>

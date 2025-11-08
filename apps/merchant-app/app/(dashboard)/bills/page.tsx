@@ -40,7 +40,7 @@ export default function MerchantBillsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 text-white p-8">
+    <div className=" text-zinc-900 bg-zinc-100 dark:bg-zinc-950  dark:text-zinc-100 ">
       <div className="max-w-7xl mx-auto">
         {/* HEADER */}
         <motion.div
@@ -51,11 +51,12 @@ export default function MerchantBillsPage() {
           <h1 className="text-5xl font-black bg-gradient-to-r from-cyan-400 to-purple-600 bg-clip-text text-transparent">
             Merchant Bill Dashboard
           </h1>
-          <p className="text-xl text-cyan-200 mt-4">Total Bills: {bills.length}</p>
+          <p className="text-xl mt-4">Total Bills: {bills.length}</p>
         </motion.div>
 
-        {/* BILLS GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className=" h-[490px] no-scrollbar overflow-y-auto px-4 pb-8">
+          {/* BILLS GRID */}
+        <div className=" grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {bills.map((bill) => {
             const due = new Date(bill.dueDate);
             const overdue = due < new Date() && bill.status !== "PAID";
@@ -64,10 +65,10 @@ export default function MerchantBillsPage() {
               <motion.div
                 key={bill.id}
                 whileHover={{ scale: 1.03 }}
-                className="cursor-pointer bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-6 shadow-2xl hover:border-cyan-400 transition-all"
+                className="cursor -pointer bg-zinc-400 dark:bg-zinc-800 backdrop-blur-xl border border-white/20 rounded-2xl p-3 shadow-2xl hover:border-zinc-400 transition-all "
               >
                 <div className="flex justify-between items-start mb-3">
-                  <h3 className="text-xl font-bold text-cyan-300">{bill.billType}</h3>
+                  <h3 className="text-xl font-bold ">{bill.billType}</h3>
                   <span
                     className={`px-3 py-1 rounded-full text-xs font-bold ${
                       bill.status === "PAID"
@@ -93,13 +94,13 @@ export default function MerchantBillsPage() {
                   <div className="mt-4 flex gap-2">
                     <Button
                       onClick={() => updateStatus(bill.id, "PAID")}
-                      className="flex-1 bg-green-600 hover:bg-green-500 text-white font-bold"
+                      className="flex-1 bg-zinc-600 hover:bg-zinc-500  font-bold"
                     >
                       Paid
                     </Button>
                     <Button
                       onClick={() => updateStatus(bill.id, "OVERDUE")}
-                      className="flex-1 bg-red-600 hover:bg-red-500 text-white font-bold"
+                      className="flex-1 bg-red-600 hover:bg-red-500  font-bold"
                     >
                       Overdue
                     </Button>
@@ -109,6 +110,9 @@ export default function MerchantBillsPage() {
             );
           })}
         </div>
+
+        </div>
+        
       </div>
     </div>
   );

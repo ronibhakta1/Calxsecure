@@ -48,8 +48,8 @@ export default function SignInPage() {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-zinc-900">
-      <Card className="w-full max-w-md shadow-lg bg-zinc-800 text-white">
+    <div className="flex items-center justify-center h-screen ">
+      <Card className="w-full max-w-md shadow-lg  ">
         <CardHeader className="text-center">
           <CardTitle className="font-bold">Sign In</CardTitle>
         </CardHeader>
@@ -62,7 +62,7 @@ export default function SignInPage() {
                 type="text"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value.replace(/\D/g, "").slice(0, 10))}
-                className="w-full p-2 border rounded-md outline-none bg-zinc-700 text-white placeholder-gray-400"
+                className="w-full p-2 border rounded-md outline-none  placeholder-gray-400"
                 placeholder="Enter Number"
                 maxLength={10}
                 required
@@ -76,17 +76,12 @@ export default function SignInPage() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-2 border rounded-md outline-none bg-zinc-700 text-white placeholder-gray-400"
+                className="w-full p-2 border rounded-md outline-none  placeholder-gray-400"
                 placeholder="Enter password"
                 required
                 disabled={loading}
               />
-              <p className="text-sm text-gray-600 pl-2 mt-1">
-                Forgot your password?{" "}
-                <a href="/auth/reset-password" className="text-zinc-500 hover:underline">
-                  Reset Password
-                </a>
-              </p>
+             
             </div>
 
             {/* ERROR MESSAGE */}
@@ -103,13 +98,19 @@ export default function SignInPage() {
             >
               {loading ? "Signing in..." : "Sign In"}
             </button>
+             <p className="text-sm text-gray-600 pl-2 mt-1">
+
+                <a href="/auth/reset-password" className="hover:text-zinc-900 text-zinc-500 underline hover:underline">
+                   Forgot your password
+                </a>
+              </p>
           </form>
         </CardContent>
 
         <CardFooter className="flex flex-col items-center text-sm text-gray-600">
           <p>
             Don’t have an account?{" "}
-            <a href="/auth/signup" className="ml-1 text-zinc-500 hover:underline">
+            <a href="/auth/signup" className="ml-1 text-zinc-500 hover:text-zinc-900 underline">
               Sign Up
             </a>
           </p>

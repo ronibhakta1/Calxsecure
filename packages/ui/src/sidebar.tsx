@@ -7,6 +7,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./tool
 import { LogOut, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { signIn, signOut, useSession } from "next-auth/react";
+import Link from "next/link";
 
 interface Links {
   label: string;
@@ -167,7 +168,7 @@ export const SidebarLink = ({
 }) => {
   const { open, animate } = useSidebar();
   return (
-    <a
+    <Link
       href={link.href}
       className={cn(
         "flex items-center justify-start gap-2 group/sidebar py-2",
@@ -175,7 +176,7 @@ export const SidebarLink = ({
       )}
       {...props}
     >
-      <div className="text-zinc-300 hover:text-zinc-100 dark:text-zinc-400 dark:hover:text-zinc-300">
+      <div className="">
         {link.icon}
       </div>
 
@@ -185,12 +186,12 @@ export const SidebarLink = ({
           opacity: animate ? (open ? 1 : 0) : 1,
         }}
         className={cn(
-          "text-zinc-100 dark:text-white text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
+          "text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0"
         )}
       >
         {link.label}
       </motion.span>
-    </a>
+    </Link>
   );
 };
 

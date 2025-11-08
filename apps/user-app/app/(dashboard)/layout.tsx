@@ -1,73 +1,61 @@
 "use client";
 import { useSession } from "next-auth/react";
-import { BrickWallFire, Home, LayoutDashboard, Repeat, Send,} from 'lucide-react';
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '../../../../packages/ui/src/avatar';
-import {  TooltipProvider, } from '../../../../packages/ui/src/tooltip';
+import { Home, LayoutDashboard, Send, Repeat, BrickWallFire, Wallet } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '../../../../packages/ui/src/avatar';
+import { TooltipProvider } from '../../../../packages/ui/src/tooltip';
 import { Sidebar, SidebarBody, SidebarLink, SignupBtn } from '../../../../packages/ui/src/sidebar';
+import { useMemo } from 'react';
 
-
-// Your Links Interface
 interface Links {
   label: string;
   href: string;
-  icon: React.JSX.Element | React.ReactNode;
+  icon: React.JSX.Element;
 }
 
-const sidebarLinks: Links[] = [
-  { label: "Home", href: "/", icon: <Home className="w-5 h-5" /> },
-  { label: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
-  { label: "Transfer", href: "/transfer", icon: <Send className="w-5 h-5" /> },
-  { label: "P2P Transfer", href: "/p2p", icon: <Repeat className="w-5 h-5" /> },
-  { label: "Bills", href: "/bills", icon: <BrickWallFire className="w-5 h-5" /> },
-];
-  
-
-export default function Layout({
-  children,
-}: {
-  children: React.ReactNode;
-}): JSX.Element {
+export default function Layout({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession();
+
+  const sidebarLinks = useMemo<Links[]>(() => [
+    { label: "Home", href: "/", icon: <Home className="w-5 h-5" /> },
+    { label: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
+    { label: "Transfer", href: "/transfer", icon: <Send className="w-5 h-5" /> },
+    { label: "P2P Transfer", href: "/p2p", icon: <Repeat className="w-5 h-5" /> },
+    { label: "Bills", href: "/bills", icon: <BrickWallFire className="w-5 h-5" /> },
+    { label: "Recharge", href: "/recharge", icon: <Wallet className="w-5 h-5" /> },
+  ], []);
 
   return (
     <TooltipProvider>
       <div className="flex h-screen">
         <Sidebar>
-          <SidebarBody className="h-screen bg-zinc-800 flex flex-col ">
-            <nav className="flex flex-col  gap-2 flex-1">
+          <SidebarBody className="h-screen bg-zinc-400 flex text-zinc-900 flex-col dark:bg-zinc-950 dark:text-zinc-100">
+            <nav className="flex flex-col gap-2 flex-1">
               {sidebarLinks.map((link) => (
                 <SidebarLink key={link.href} link={link} />
               ))}
             </nav>
 
-            <div className=" border-t border-neutral-200 dark:border-neutral-700">
-              <div className="flex items-center gap-3">
-                <Avatar className="h-8 w-8 ">
+            <div className="border-t border-neutral-200 dark:border-neutral-700">
+              <div className="flex items-center gap-3 p-2">
+                <Avatar className="h-8 w-8">
                   <AvatarImage src={undefined} alt="@user" />
                   <AvatarFallback>{session?.user?.name?.[0] || "US"}</AvatarFallback>
                 </Avatar>
-                
-                <div className="min-w-0 flex-1 ">
-                  <p className="text-sm font-medium truncate  text-zinc-100 dark:text-white">
-                    {session?.user?.name || "Nasir Nadaf"}
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-medium truncate">
+                    {session?.user?.name || "Your Name"}
                   </p>
-                  <p className="text-xs text-neutral-400 truncate">
+                  <p className="text-xs truncate">
                     {session?.user?.number || "+1234567890"}
                   </p>
                 </div>
-
-                {/* LOGOUT/SIGNIN */}
                 <SignupBtn />
               </div>
             </div>
           </SidebarBody>
         </Sidebar>
 
-        <main className="flex-1 overflow-y-auto bg-zinc-700 dark:bg-neutral-100 ">
+        <main className="flex-1 overflow-y-auto bg-zinc-100 dark:bg-zinc-900 p-3 h-screen">
           {children}
         </main>
       </div>

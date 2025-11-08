@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { motion } from "motion/react";
-import { cn } from "../../lib/utils";
 
 import { signOut, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -9,6 +8,11 @@ import { Avatar, AvatarFallback, AvatarImage } from "../../../../packages/ui/src
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "./dropdown-menu";
 import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
 import { TextHoverEffect } from "../../../../packages/ui/src/text-hover-effect";
+import { useTheme } from "next-themes";
+import { Moon, Sun } from "lucide-react";
+import Link from "next/link";
+import { cn } from "../../lib/utils";
+import { Button } from "@repo/ui/button";
 
 export const FloatingNav = ({
   navItems,
@@ -21,6 +25,7 @@ export const FloatingNav = ({
   }[];
   className?: string;
 }) => {
+    const { theme , setTheme } = useTheme();
 
     const { data: session, status } = useSession();
       const router = useRouter();
@@ -49,7 +54,7 @@ export const FloatingNav = ({
       >
         <TextHoverEffect text="CalxSecure" />
         {navItems.map((navItem, idx) => (
-          <a
+          <Link
             key={`link-${idx}`}
             href={navItem.link}
             className={cn(
@@ -58,7 +63,7 @@ export const FloatingNav = ({
           >
             {navItem.icon && <span className="block sm:hidden">{navItem.icon}</span>}
             <span className="hidden sm:block text-sm">{navItem.name}</span>
-          </a>
+          </Link>
         ))}
 
         { status === "unauthenticated" && (
@@ -72,7 +77,7 @@ export const FloatingNav = ({
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
                 <Avatar className="cursor-pointer"> 
-                  <AvatarImage src={session?.user?.image || "https://github.com/shadcn.png"} alt="@user" />
+                  <AvatarImage src={  "https://github.com/shadcn.png"} alt="@user" />
                   <AvatarFallback>{session?.user?.name?.[0] || "US"}</AvatarFallback>
                 </Avatar>
             </DropdownMenuTrigger>
@@ -84,9 +89,20 @@ export const FloatingNav = ({
             </DropdownMenuContent>
 
           </DropdownMenu>
+
           
         )}
-        
+
+        {theme === "light" ? (
+          <Button onClick={() => setTheme("dark")} className=" bg-zinc-800 hover:bg-zinc-700 rounded-full py-2"   >
+            <Sun className="absolute h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:rotate-90 " />
+          </Button>
+        ) : (
+          <Button onClick={() => setTheme("light")}className=" bg-zinc-100 hover:bg-zinc-200 rounded-full py-2" >
+            <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0 " />
+          </Button>
+        )}
+
         
       </motion.div>
   );

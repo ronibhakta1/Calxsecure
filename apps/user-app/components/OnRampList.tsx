@@ -1,16 +1,16 @@
 "use client";
 
-import { Card, CardHeader, CardTitle, CardContent } from "./ui/card";
+import {  CardContent } from "./ui/card";
 
 export function OnRampList({ onRamps }: { onRamps: any[] }) {
   return (
-    <Card className="bg-zinc-700 text-zinc-100" aria-labelledby="onramp-title">
+    <div  aria-labelledby="onramp-title" >
       <CardContent>
         <ul className="space-y-3 ">
           {onRamps.map((r) => (
             <li
               key={r.id}
-              className="flex justify-between border-b border-zinc-600 pb-2 transition-all hover:bg-zinc-600/50"
+              className="flex justify-between border-b border-zinc-400 pb-2 transition-all "
               aria-label={`On-ramp transaction with ${r.provider}, status: ${r.status}`}
             >
               <div>
@@ -34,6 +34,6 @@ export function OnRampList({ onRamps }: { onRamps: any[] }) {
           ))}
         </ul>
       </CardContent>
-    </Card>
+    </div>
   );
 }

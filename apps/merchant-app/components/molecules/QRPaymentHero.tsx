@@ -7,6 +7,7 @@ import { Button } from "../atoms/Button";
 import { motion } from "framer-motion";
 import { LampContainer } from "../ui/lamp";
 import { TextInput } from "@repo/ui/textinput";
+import { HoverBorderGradient } from "../ui/hover-border-gradient";
 
 export default function QRPaymentHero() {
   const [amount, setAmount] = useState("");
@@ -61,15 +62,15 @@ export default function QRPaymentHero() {
 
   
   return (
-  <LampContainer className="p-90">
+  <LampContainer className="w-full" >
     <motion.h1
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
-      className="text-5xl md:text-7xl font-bold text-center bg-gradient-to-br from-cyan-300 to-purple-600 bg-clip-text text-transparent"
+      className="text-5xl md:text-7xl font-bold text-center bg-gradient-to-br from-cyan-300 to-purple-600 bg-clip-text text-transparent "
     >
     </motion.h1>
 
-    <div className="flex justify-center">
+    <div className="flex justify-center text-zinc-950 dark:text-zinc-100 ">
       <div className="relative flex flex-col items-center p-10 rounded-md w-[1000px] max-w-md space-y-4">
         {/* FORM — LEFT SIDE */}
         <TextInput
@@ -77,22 +78,25 @@ export default function QRPaymentHero() {
           placeholder="Enter amount (INR)"
           value={amount}
           onChange={(value) => setAmount(value)}
-          className="text-zinc-100 border-zinc-600"
+          className=" border-zinc-400 dark:border-zinc-600"
         />
         <TextInput
           label="Description"
           placeholder="Description (max 20 chars)"
           value={description}
           onChange={(value) => setDescription(value.slice(0, 20))}
-          className="text-zinc-100 border-zinc-600"
+          className="border-zinc-400 dark:border-zinc-600"
         />
-        <Button
+        <HoverBorderGradient>
+          <button
           onClick={handleGenerate}
           disabled={generateQR.isPending}
-          className="bg-blue-600 hover:bg-blue-700"
         >
           {generateQR.isPending ? "Generating..." : "Generate QR Code"}
-        </Button>
+        </button>
+
+        </HoverBorderGradient>
+        
 
         {/* QR — APPEARS ON RIGHT SIDE */}
         {qrData && (
@@ -107,7 +111,7 @@ export default function QRPaymentHero() {
               className="w-72 h-72"
               style={{ backgroundColor: "#27272A" }}
             />
-            <div className="text-center mt-4 text-cyan-300">
+            <div className="text-center mt-4 text-zinc-300 dark:text-zinc-400 ">
               <p className="font-bold text-xl">₹{amount}</p>
               <p className="text-sm">7822952595@ibl</p>
               <p className="mt-2 text-lg font-semibold">
@@ -125,7 +129,7 @@ export default function QRPaymentHero() {
                       .catch((err) => alert(`Confirmation failed: ${err.response?.data?.error || err.message}`));
                   }
                 }}
-                className="mt-4 w-full bg-green-600 hover:bg-green-700"
+                className="mt-4 w-full bg-zinc-600 hover:bg-zinc-700"
               >
                 Confirm Payment
               </Button>

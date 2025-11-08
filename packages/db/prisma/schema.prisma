@@ -26,16 +26,27 @@ model User {
   receivedRequests  P2PRequest[]       @relation("P2PRequestReceiver")
   billSchedules     BillSchedule[]
   merchantPayments  MerchantPayment[]   @relation("UserMerchantPayments")
+  rechargeOrders    RechargeOrder[]     
+  rewards           Reward[]
+  referralsAsReferrer  Referral[]       @relation("Referrer")
+  referralsAsReferred Referral[]        @relation("Referred")
+  wrongSendRequests   WrongSendRequest[] @relation("UserWrongSendRequests")
+  
+
 }
 
 model p2pTransfer {
-  id         Int          @id @default(autoincrement())
-  amount     Int
-  timestamp  DateTime
-  fromUserId Int
-  fromUser   User         @relation(name: "FromUserRelation", fields: [fromUserId], references: [id])
-  toUserId   Int
-  toUser     User         @relation(name: "ToUserRelation", fields: [toUserId], references: [id])
+  id                Int               @id @default(autoincrement())
+  amount            Int
+  timestamp         DateTime
+  fromUserId        Int
+  fromUser          User              @relation("FromUserRelation", fields: [fromUserId], references: [id])
+  toUserId          Int?
+  toUser            User?             @relation("ToUserRelation", fields: [toUserId], references: [id])
+  receiverNumber    String?
+  status            String            @default("SUCCESS") // SUCCESS, REFUND_PENDING, REFUNDED
+  razorpayPaymentId String?           @unique
+  wrongSendRequest  WrongSendRequest?
 }
 model Merchant {
   id               Int               @id @default(autoincrement())
@@ -106,16 +117,109 @@ model BillSchedule {
   paymentMethod String @default("UPI")
   status      String @default("PENDING")
   token       String?   @unique
+
   
   @@map("bill_schedules")
 }
 
+model RechargePlan{
+  id         Int      @id @default(autoincrement())
+  operator    String
+  circle      String
+  planCode    String  
+  amount      Int
+  planType    String
+  validity    String?
+  data        String?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  rechargeOrders RechargeOrder[]
+  @@map("recharge_plans")
+}
+model RechargeOrder{
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  planId      Int?
+  plan        RechargePlan? @relation(fields: [planId], references: [id])
+  mobileNumber String
+  operator     String
+  circle       String
+  amount       Int
+  status       String  @default("PENDING") // PENDING, SUCCESS, FAILED
+  providerTxnId String?  // Transaction ID from operator
+  orderId      String   @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  @@map("recharge_orders")
+}
+
+model Reward {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  type         RewardType
+  amount       BigInt   // paise
+  status       RewardStatus @default(PENDING)
+  earnedAt     DateTime @default(now())
+  expiresAt    DateTime?
+  metadata     Json?
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([type])
+}
+
+model Referral {
+  id             Int   @id @default(autoincrement())
+  referrerId     Int
+  referredUserId Int?
+  referralCode   String @unique
+  referrer       User  @relation("Referrer", fields: [referrerId], references: [id])
+  referred       User? @relation("Referred", fields: [referredUserId], references: [id])
+
+  @@index([referralCode])
+}
+model WrongSendRequest {
+  id               Int      @id @default(autoincrement())
+  txnId            Int      @unique
+  senderId         Int
+  receiverNumber   String
+  amount           BigInt
+  status           WrongSendStatus @default(PENDING)
+  expiresAt        DateTime
+  penaltyPaid      Boolean  @default(false)
+  razorpayRefundId String?  @unique
+  createdAt        DateTime @default(now())
+  sender           User     @relation("UserWrongSendRequests", fields: [senderId], references: [id])
+  transaction      p2pTransfer @relation(fields: [txnId], references: [id])
+
+  @@index([status])
+}
+enum WrongSendStatus {
+  PENDING
+  RETURNED
+  EXPIRED
+}
 enum BillType {
   ELECTRICITY
   WATER
   GAS
   PHONE_RECHARGE
   DTH
+}
+enum RewardType {
+  CASHBACK
+  SCRATCH
+  REFERRAL
+  MILESTONE
+}
+
+enum RewardStatus {
+  PENDING
+  CLAIMED
+  EXPIRED
 }
 
 enum P2PRequestStatus {

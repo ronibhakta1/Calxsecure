@@ -3,6 +3,7 @@ import { useState } from "react";
 import { auth, RecaptchaVerifier, signInWithPhoneNumber } from "@/lib/firebase";
 import { useRouter } from "next/navigation";
 import { useOtp } from "@/contexts/OTPContext";
+import { Card } from "@/components/ui/card";
 
 declare global {
   interface Window {
@@ -57,17 +58,17 @@ export default function ResetPassword() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-zinc-900 p-4">
-      <form onSubmit={handleSendOTP} className="w-full max-w-md space-y-4 bg-zinc-800 p-6 rounded-lg text-white">
+    <Card className="flex items-center justify-center min-h-screen p-4">
+      <form onSubmit={handleSendOTP} className="w-full max-w-md space-y-4  p-6 rounded-lg ">
         <h2 className="text-xl font-bold text-center">Reset Password</h2>
         <div className="flex">
-          <span className="p-3 bg-zinc-700 rounded-l-md">+91</span>
+          <span className="p-3 rounded-l-md">+91</span>
           <input
             type="text"
             value={phone}
             onChange={(e) => setPhone(e.target.value.replace(/\D/g, ""))}
             placeholder="Enter phone number"
-            className="flex-1 p-3 bg-zinc-700 rounded-r-md outline-none"
+            className="flex-1 p-3  rounded-r-md outline-none"
             maxLength={10}
             required
           />
@@ -77,11 +78,11 @@ export default function ResetPassword() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full bg-zinc-500 py-2 rounded-md hover:bg-zinc-600 disabled:opacity-50"
+          className="w-full bg-zinc-400 py-2 rounded-md hover:bg-zinc-500 disabled:opacity-50 dark:bg-zinc-900 dark:hover:bg-zinc-950"
         >
           {loading ? "Sending..." : "Send OTP"}
         </button>
       </form>
-    </div>
+    </Card>
   );
 }

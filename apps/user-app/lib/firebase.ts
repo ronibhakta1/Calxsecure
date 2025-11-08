@@ -1,4 +1,4 @@
-// lib/firebase.ts
+
 import { getApps, initializeApp } from "firebase/app";
 import { getAuth, RecaptchaVerifier, signInWithPhoneNumber } from "firebase/auth";
 
