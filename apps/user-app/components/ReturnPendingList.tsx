@@ -7,7 +7,6 @@ import toast from "react-hot-toast";
 import confetti from "canvas-confetti";
 import formatDistanceToNow from "date-fns/formatDistanceToNow";
 import axios from "axios";
-import { HoverBorderGradient } from "./ui/hover-border-gradient";
 
 type ReturnItem = {
   id: number;
@@ -22,19 +21,16 @@ export default function ReturnPendingList({ returns }: { returns: ReturnItem[] }
   const [pin, setPin] = useState("");
   const [showPin, setShowPin] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [status , setStatus] = useState(false);
 
   const handleReturn = async () => {
     if (!selected || pin.length !== 4) return;
     setLoading(true);
     try {
       await axios.post("/api/wrong-send/approve", { requestId: selected.id, pin });
+      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
       toast.success(`Returned ₹${selected.amount}!`);
-      setStatus(true);
-      
       setSelected(null);
       setPin("");
-      confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
     } catch {
       toast.error("Wrong PIN");
       setPin("");
@@ -53,29 +49,28 @@ export default function ReturnPendingList({ returns }: { returns: ReturnItem[] }
             onClick={() => setSelected(r)}
           >
             <CardContent className="p-5">
-              <div className="flex justify-between items-center ">
+              <div className="flex justify-between items-start">
                 <div className="space-y-2">
-                  <p className="font-semibold  text-lg">
-                    {r.senderName} sent you by mistake
+                  <p className="font-semibold text-white text-lg">
+                    {r.senderName} sent you
                   </p>
-                  <p className="text-3xl font-bold text-zinc-100">₹{r.amount}</p>
-                  <p className="text-xs text-red-700">
-                    Return it <span className="font-medium">
+                  <p className="text-3xl font-bold text-green-400">₹{r.amount}</p>
+                  <p className="text-xs text-red-300">
+                    Return in <span className="font-medium">
                       {formatDistanceToNow(r.expiresAt, { addSuffix: true })}
-                    </span>, to avoid panelty
+                    </span>
                   </p>
                 </div>
-                <HoverBorderGradient>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelected(r);
-                    }}
-                  >
-                    Return Now
-                  </button>
-                </HoverBorderGradient>
-                
+                <Button
+                  size="sm"
+                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelected(r);
+                  }}
+                >
+                  Return Now
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -85,22 +80,22 @@ export default function ReturnPendingList({ returns }: { returns: ReturnItem[] }
   }
 
   return (
-    <Card className="bg-zinc-300 border-green-700/10  shadow-2xl max-w-md mx-auto dark:bg-zinc-800 ">
+    <Card className="bg-gradient-to-b from-zinc-800 to-zinc-900 border-green-700/50 shadow-2xl max-w-md mx-auto">
       <CardHeader className="text-center">
-        {status && <CheckCircle className="w-12 h-12 text-green-100 dark:text-green-500 mx-auto mb-3" />}
-        <CardTitle className="text-xl ">
-          {status ? "Return Successful!" : "Return Funds"}
+        <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
+        <CardTitle className="text-xl text-white">
+          Return ₹{selected.amount}
         </CardTitle>
-        <p className="text-zinc-200 text-sm dark:text-zinc-400 ">
+        <p className="text-zinc-400 text-sm">
           {selected.senderName} sent this by mistake
         </p>
       </CardHeader>
 
       <CardContent className="space-y-5">
         {/* Amount Display */}
-        <div className=" rounded-xl p-4 text-center">
-          <p className="text-sm ">Amount to Return</p>
-          <p className="text-3xl font-bold">₹{selected.amount}</p>
+        <div className="bg-green-900/30 border border-green-700/50 rounded-xl p-4 text-center">
+          <p className="text-sm text-green-300">Amount to Return</p>
+          <p className="text-3xl font-bold text-green-400">₹{selected.amount}</p>
         </div>
 
         {/* PIN Input */}
@@ -111,7 +106,7 @@ export default function ReturnPendingList({ returns }: { returns: ReturnItem[] }
             onChange={(e) => setPin(e.target.value.slice(0, 4))}
             placeholder="••••"
             maxLength={4}
-            className="w-full text-center text-3xl tracking-widest font-mono bg-zinc-500 border border-zinc-600 rounded-xl p-5 text-white placeholder-zinc-500 focus:border-zinc-500 focus:outline-none dark:bg-zinc-800 "
+            className="w-full text-center text-3xl tracking-widest font-mono bg-zinc-700 border border-zinc-600 rounded-xl p-5 text-white placeholder-zinc-500 focus:border-green-500 focus:outline-none"
           />
           <button
             type="button"
@@ -131,7 +126,7 @@ export default function ReturnPendingList({ returns }: { returns: ReturnItem[] }
           <Button
             variant="outline"
             onClick={() => { setSelected(null); setPin(""); }}
-            className="flex-1 h-12 "
+            className="flex-1 h-12"
             disabled={loading}
           >
             Cancel
@@ -139,7 +134,7 @@ export default function ReturnPendingList({ returns }: { returns: ReturnItem[] }
           <Button
             onClick={handleReturn}
             disabled={pin.length !== 4 || loading}
-            className="flex-1 h-12 bg-green-400 hover:bg-green-300 font-semibold text-white"
+            className="flex-1 h-12 bg-green-600 hover:bg-green-700 font-semibold text-white"
           >
             {loading ? (
               <>
@@ -147,7 +142,7 @@ export default function ReturnPendingList({ returns }: { returns: ReturnItem[] }
                 Returning...
               </>
             ) : (
-              `Return`
+              `Return ₹${selected.amount}`
             )}
           </Button>
         </div>

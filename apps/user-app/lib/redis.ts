@@ -1,17 +1,20 @@
 import Redis from "ioredis";
 
-let redis: Redis | null = null;
+type IORedisClient = InstanceType<typeof Redis>;
 
-function createRedis(): Redis {
+let redis: IORedisClient | null = null;
+
+function createRedis(): IORedisClient {
   if (redis) return redis;
 
+  // create Redis instance and cast to the instance type
   redis = new Redis(process.env.REDIS_URL || "redis://localhost:6379", {
     lazyConnect: true,
     maxRetriesPerRequest: 1,
     retryStrategy: () => null, // Don't retry
     enableOfflineQueue: false,
     enableReadyCheck: false,
-  });
+  }) as IORedisClient;
 
   // Suppress all Redis errors during build/runtime
   redis.on("error", () => {
@@ -22,7 +25,7 @@ function createRedis(): Redis {
 }
 
 // Proxy that wraps all Redis operations with error handling
-const redisProxy = new Proxy({} as Redis, {
+const redisProxy = new Proxy({} as IORedisClient, {
   get(_target, prop: string) {
     const client = createRedis();
     const original = (client as any)[prop];
@@ -31,8 +34,8 @@ const redisProxy = new Proxy({} as Redis, {
       return async (...args: any[]) => {
         try {
           // Only connect if not already connected
-          if (redis && redis.status === "wait") {
-            await redis.connect().catch(() => {});
+          if (redis && (redis as any).status === "wait") {
+            await (redis as any).connect().catch(() => {});
           }
           return await original.apply(client, args);
         } catch (error: any) {

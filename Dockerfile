@@ -1,11 +1,7 @@
-FROM node:18-alpine
+FROM node:20
 
-WORKDIR /app
-COPY package*.json turbo.json ./
-COPY apps ./apps
-COPY packages ./packages
-
-RUN npm ci --only=production && npm ci --only=dev --no-cache
-
-EXPOSE 3000 3001 3002 4000
-CMD ["npm", "run", "dev"]
+WORKDIR /repo
+RUN apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/apt/lists/*
+COPY . .
+RUN npm install
+CMD ["echo", "Base image ready"]

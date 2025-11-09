@@ -9,8 +9,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "./dropdo
 import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
 import { TextHoverEffect } from "../../../../packages/ui/src/text-hover-effect";
 import { useTheme } from "next-themes";
-import { Moon, Sun } from "lucide-react";
-import { Button } from "./button";
 import Link from "next/link";
 
 export const FloatingNav = ({
@@ -88,18 +86,7 @@ export const FloatingNav = ({
             </DropdownMenuContent>
 
           </DropdownMenu>
-
           
-        )}
-
-        {theme === "light" ? (
-          <Button onClick={() => setTheme("dark")} className=" bg-zinc-800 hover:bg-zinc-700 rounded-full py-2"   >
-            <Sun className="absolute h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:rotate-90 " />
-          </Button>
-        ) : (
-          <Button onClick={() => setTheme("light")}className=" bg-zinc-100 hover:bg-zinc-200 rounded-full py-2" >
-            <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0 " />
-          </Button>
         )}
 
         

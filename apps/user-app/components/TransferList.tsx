@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "../../../packages/ui/src/av
 
 export function TransferList({ transfers }: { transfers: any[] }) {
   return (
-    <Card className="bg-zinc-700 text-zinc-100" aria-labelledby="transfers-title">
+    <Card className=" " aria-labelledby="transfers-title">
       <CardHeader>
         <CardTitle id="transfers-title">Recent Transfers</CardTitle>
       </CardHeader>

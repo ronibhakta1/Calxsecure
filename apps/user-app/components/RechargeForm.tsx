@@ -23,7 +23,6 @@ import {
 
 import { CheckCircle, Wallet, Loader2 } from "lucide-react";
 import { Label } from "../../../packages/ui/src/label";
-import { HoverBorderGradient } from "./ui/hover-border-gradient";
 
 interface Plan { id: number; amount: number; description: string; validity: string; }
 interface Props { user: { id: number; balance: number; userpin: string; }; }
@@ -107,11 +106,14 @@ export default function RechargeForm({ user }: Props) {
   };
 
   return (
-    <Card className="max-w-2xl mx-auto space-y-6 p-4 bg-zinc-300 dark:bg-zinc-800 ">
+    <div className="max-w-2xl mx-auto space-y-6 p-4">
       {/* ---------- HEADER ---------- */}
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold ">Mobile Recharge</h1>
-        
+        <h1 className="text-2xl font-bold text-zinc-100">Mobile Recharge</h1>
+        <div className="flex items-center gap-2 text-sm text-zinc-400">
+          <Wallet className="w-4 h-4" />
+          <span>Balance: ₹{balance.toFixed(2)}</span>
+        </div>
       </div>
 
       {/* ---------- INPUT ROW ---------- */}
@@ -121,25 +123,25 @@ export default function RechargeForm({ user }: Props) {
           value={mobile}
           onChange={e => setMobile(e.target.value.replace(/\D/g, "").slice(0, 10))}
           maxLength={10}
-          className=" border-zinc-800 placeholder:text-zinc-500"
+          className="bg-zinc-900 text-zinc-100 border-zinc-800 placeholder:text-zinc-500"
         />
 
         <Select onValueChange={setOperator} value={operator}>
-          <SelectTrigger className=" border-zinc-800">
+          <SelectTrigger className="bg-zinc-900 text-zinc-100 border-zinc-800">
             <SelectValue placeholder="Operator" />
           </SelectTrigger>
-          <SelectContent >
+          <SelectContent className="bg-zinc-900 border-zinc-800">
             <SelectItem value="Jio">Jio</SelectItem>
             <SelectItem value="Airtel">Airtel</SelectItem>
             <SelectItem value="Vi">Vi</SelectItem>
           </SelectContent>
-        </Select> 
+        </Select>
 
         <Select onValueChange={setCircle} value={circle}>
-          <SelectTrigger className=" border-zinc-800">
+          <SelectTrigger className="bg-zinc-900 text-zinc-100 border-zinc-800">
             <SelectValue placeholder="Circle" />
           </SelectTrigger>
-          <SelectContent className="max-h-60 overflow-y-auto border-zinc-800">
+          <SelectContent className="max-h-60 overflow-y-auto bg-zinc-900 border-zinc-800">
             {[
               "Andhra Pradesh","Assam","Bihar & Jharkhand","Chennai","Delhi NCR",
               "Gujarat","Haryana","Himachal Pradesh","Jammu & Kashmir","Karnataka",
@@ -154,40 +156,32 @@ export default function RechargeForm({ user }: Props) {
       </div>
 
       {/* ---------- PLANS GRID ---------- */}
-      <div className="h-[360px] overflow-y-auto no-scrollbar rounded-b-xl ">
-        {loading ? (
-            <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-zinc-500 dark:text-zinc-400" /></div>
-          ) : plans.length ? (
-            <div className="grid gap-4 sm:grid-cols-2">
-              {plans.map(p => (
-                <Card key={p.id} className="bg-zinc-400 border-zinc-800 dark:border-zinc-700 hover:border-zinc-700 transition-colors">
-                  <CardContent className="p-4 flex justify-between items-center">
-                    <div className="space-y-1">
-                      <p className="text-xl font-bold ">₹{p.amount}</p>
-                      <p className="text-sm ">{p.description}</p>
-                      <p className="text-xs ">Validity: {p.validity}</p>
-                    </div>
-                    <HoverBorderGradient>
-                      <Button
-                      onClick={() => selectPlan(p)}
-                      disabled={loading || balance < p.amount}
-                      className="text-zinc-950 dark:text-zinc-100 p-0 border-none shadow-none"
-                    >
-                        Recharge
-                      </Button>
-
-                    </HoverBorderGradient>
-                    
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <p className="text-center text-zinc-500">Select operator & circle to view plans.</p>
-          )}
-
-      </div>
-      
+      {loading ? (
+        <div className="flex justify-center py-8"><Loader2 className="w-6 h-6 animate-spin text-zinc-500" /></div>
+      ) : plans.length ? (
+        <div className="grid gap-4 sm:grid-cols-2">
+          {plans.map(p => (
+            <Card key={p.id} className="bg-zinc-900/50 border-zinc-800 hover:border-zinc-700 transition-colors">
+              <CardContent className="p-4 flex justify-between items-center">
+                <div className="space-y-1">
+                  <p className="text-xl font-bold text-green-500">₹{p.amount}</p>
+                  <p className="text-sm text-zinc-300">{p.description}</p>
+                  <p className="text-xs text-zinc--500">Validity: {p.validity}</p>
+                </div>
+                <Button
+                  onClick={() => selectPlan(p)}
+                  disabled={loading || balance < p.amount}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  Recharge
+                </Button>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <p className="text-center text-zinc-500">Select operator & circle to view plans.</p>
+      )}
 
       {/* ---------- CONFIRM DIALOG ---------- */}
       <Dialog open={showPlanDialog} onOpenChange={setShowPlanDialog}>
@@ -260,6 +254,6 @@ export default function RechargeForm({ user }: Props) {
           </div>
         </div>
       )}
-    </Card>
+    </div>
   );
 }

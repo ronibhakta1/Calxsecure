@@ -13,9 +13,9 @@ import tan from "@/public/tan.jpeg";
 import nasir from "@/public/nasir.jpg";
 import vikas from "@/public/vikas.jpeg";
 import { PointerHighlight } from "../../components/ui/pointer-highlight";
-import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision";
 import { ShootingStars } from "@/components/ui/shooting-stars";
 import { StarsBackground } from "@/components/ui/stars-background";
+import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision";
 
 const Page = () => {
   const navItems = [
@@ -80,7 +80,7 @@ const Page = () => {
       description: "PCI DSS & GDPR certified",
     },
   ];
-      
+
   const { status } = useSession();
   const router = useRouter();
 

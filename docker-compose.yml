@@ -1,45 +1,55 @@
+version: "3.8"
+
 services:
   db:
-    image: postgres:14-alpine
-    restart: always
+    image: postgres:15
+    container_name: turbo_postgres
+    restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: mysecretpassword
       POSTGRES_DB: postgres
     ports:
-      - '5431:5432'
+      - "5431:5432"
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql/data  
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
-  migrate:
+  setup:
     build: .
-    command: npm run db:migrate --workspace=@repo/db
+    container_name: turbo_setup
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    volumes:
+      - ./:/repo
+    working_dir: /repo
     environment:
       DATABASE_URL: postgresql://postgres:mysecretpassword@db:5432/postgres
+    command: >
+      bash -c "
+        echo '🔧 Copying .env files if missing...' &&
+        cp -n apps/user-app/.env.example apps/user-app/.env || true &&
+        cp -n apps/merchant-app/.env.example apps/merchant-app/.env || true &&
+        cp -n packages/db/.env.example packages/db/.env || true &&
 
-  user-app:
-    build: ./apps/user-app
-    command: npm run dev
-    depends_on:
-      - db
-      - migrate
-    environment:
-      DATABASE_URL: postgresql://postgres:mysecretpassword@db:5432/postgres
-    ports:
-      - "3001:3001"
+        echo '🔁 Updating DATABASE_URL inside packages/db/.env to use db:5432...' &&
+        sed -i 's/localhost:5431/db:5432/g' packages/db/.env &&
 
-  merchant-app:
-    build: ./apps/merchant-app
-    command: npm run dev
-    depends_on:
-      - db
-      - migrate
-    environment:
-      DATABASE_URL: postgresql://postgres:mysecretpassword@db:5432/postgres
-    ports:
-      - "3002:3002"
+        echo '🚀 Running Prisma migrate + generate...' &&
+        cd packages/db &&
+        npx prisma migrate deploy --schema=prisma/schema.prisma &&
+        npx prisma generate --schema=prisma/schema.prisma &&
+        npx prisma db seed --schema=prisma/schema.prisma &&
+        npx prisma db seedreward --schema=prisma/schema.prisma &&
+
+
+        echo '✅ Prisma setup complete!'
+      "
 
 volumes:
-  db-data:
+  db_data:  

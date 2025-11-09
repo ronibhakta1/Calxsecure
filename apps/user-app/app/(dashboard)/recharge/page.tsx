@@ -3,23 +3,12 @@ import { getServerSession } from "next-auth";
 import prisma from "@repo/db/client";
 import { authOptions } from "@/app/lib/auth";
 import RechargeForm from "@/components/RechargeForm";
-import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
-import Link from "next/link";
 
 export default async function RechargePage() {
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    return (
-      <div className="flex gap-3 flex-col items-center justify-center h-full w-full">
-        <h1 className="text-3xl font-bold">Please log in to view your transfers.</h1>
-        <HoverBorderGradient>
-          <Link href={"/auth/signin"}>
-            Login
-          </Link>
-        </HoverBorderGradient>
-      </div>
-    );
+    return <div className="p-6 text-center text-zinc-100">Please log in to access recharge.</div>;
   }
 
   const user = await prisma.user.findUnique({
@@ -38,17 +27,17 @@ export default async function RechargePage() {
   });
 
   if (!user || !user.Balance || user.Balance.length === 0) {
-    return <div className="p-6 text-center ">User not found or balance missing.</div>;
+    return <div className="p-6 text-center text-zinc-100">User not found or balance missing.</div>;
   }
 
   const balanceInRupees = Number(user.Balance[0]?.amount ?? 0) / 100;
 
   return (
-    <div className=" max-w-4xl mx-auto ">
-      <h1 className="text-3xl font-bold pb-3">Mobile Recharge</h1>
+    <div className="p-6 max-w-4xl mx-auto space-y-4">
+      <h1 className="text-3xl font-bold text-zinc-100">Mobile Recharge</h1>
 
       {!user.userpin ? (
-        <div className="text-zinc-800">Please set your transaction PIN before proceeding.</div>
+        <div className="text-zinc-400">Please set your transaction PIN before proceeding.</div>
       ) : (
         <RechargeForm
           user={{
@@ -56,7 +45,6 @@ export default async function RechargePage() {
             balance: balanceInRupees,
             userpin: user.userpin,
           }}
-          
         />
       )}
     </div>
