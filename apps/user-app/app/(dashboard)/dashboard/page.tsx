@@ -1,14 +1,15 @@
+
 import { getServerSession } from "next-auth";
 import prisma from "@repo/db/client";
 import { BalanceCard } from "@/components/BalanceCard";
-import { TransferList } from "@/components/TransferList";
-import { OnRampList } from "@/components/OnRampList";
 import { StatsCards } from "@/components/StatsCards";
 import { DashboardClient } from "@/components/DashboardClient";
-import { Avatar, AvatarFallback, AvatarImage } from "../../../../../packages/ui/src/avatar";
 import { Toaster } from "react-hot-toast";
 import { authOptions } from "@/app/lib/auth";
 import { startOfDay, subDays, format } from "date-fns";
+import ReturnPendingList from "@/components/ReturnPendingList";
+import { P2PTransactionHistory } from "@/components/P2PTransactionHistory"; // NEW
+import { Avatar, AvatarFallback, AvatarImage } from "../../../../../packages/ui/src/avatar";
 
 async function getDashboardData(userId: number) {
   const balance = await prisma.balance.findFirst({ where: { userId } });
@@ -16,10 +17,11 @@ async function getDashboardData(userId: number) {
   const transfers = await prisma.p2pTransfer.findMany({
     where: {
       OR: [{ fromUserId: userId }, { toUserId: userId }],
+      NOT: { status: "REFUNDED", fromUserId: userId }, // Hide refunded sent
     },
-    include: { fromUser: true, toUser: true },
+    include: { fromUser: true, toUser: true, wrongSendRequest: true },
     orderBy: { timestamp: "desc" },
-    take: 5,
+    take: 10,
   });
 
   const onRamps = await prisma.onRampTransaction.findMany({
@@ -28,88 +30,98 @@ async function getDashboardData(userId: number) {
     take: 5,
   });
 
-  // Aggregate data for chart (last 6 days)
-  const startDate = startOfDay(subDays(new Date(), 5));
-  const endDate = startOfDay(new Date());
+  // PENDING RETURNS (Receiver side)
+  const pendingRequests = await prisma.wrongSendRequest.findMany({
+    where: {
+      transaction: { toUserId: userId },
+      status: "PENDING",
+      expiresAt: { gt: new Date() },
+    },
+    include: {
+      sender: { select: { name: true } },
+      transaction: { select: { amount: true, timestamp: true } },
+    },
+    orderBy: { expiresAt: "asc" },
+  });
 
-  const sentTransfers = await prisma.p2pTransfer.groupBy({
+  const pendingReturns = pendingRequests.map(r => ({
+    id: r.id,
+    senderName: r.sender.name || "Unknown",
+    amount: Number(r.transaction.amount) / 100,
+    expiresAt: r.expiresAt,
+    timestamp: r.transaction.timestamp,
+  }));
+
+  // Chart data
+  const start = startOfDay(subDays(new Date(), 5));
+  const sent = await prisma.p2pTransfer.groupBy({
     by: ["timestamp"],
-    where: { fromUserId: userId, timestamp: { gte: startDate, lte: endDate } },
+    where: { fromUserId: userId, timestamp: { gte: start } },
     _sum: { amount: true },
-    orderBy: { timestamp: "asc" },
   });
-
-  const receivedTransfers = await prisma.p2pTransfer.groupBy({
+  const received = await prisma.p2pTransfer.groupBy({
     by: ["timestamp"],
-    where: { toUserId: userId, timestamp: { gte: startDate, lte: endDate } },
+    where: { toUserId: userId, timestamp: { gte: start } },
     _sum: { amount: true },
-    orderBy: { timestamp: "asc" },
   });
 
-  const onRampTransactions = await prisma.onRampTransaction.groupBy({
-    by: ["startTime"],
-    where: { userId, startTime: { gte: startDate, lte: endDate } },
-    _sum: { amount: true },
-    orderBy: { startTime: "asc" },
-  });
-
-  // Generate labels and data for chart
-  const labels = Array.from({ length: 6 }, (_, i) => format(subDays(new Date(), 5 - i), "yyyy-MM-dd"));
-  const sentData = labels.map((date) => {
-    const dayData = sentTransfers.find((t) => format(t.timestamp, "yyyy-MM-dd") === date);
-    return (dayData?._sum?.amount || 0) / 100;
-  });
-  const receivedData = labels.map((date) => {
-    const dayData = receivedTransfers.find((t) => format(t.timestamp, "yyyy-MM-dd") === date);
-    return (dayData?._sum?.amount || 0) / 100;
-  });
-  const onRampData = labels.map((date) => {
-    const dayData = onRampTransactions.find((t) => format(t.startTime, "yyyy-MM-dd") === date);
-    return (dayData?._sum?.amount || 0) / 100;
-  });
+  const labels = Array.from({ length: 6 }, (_, i) => format(subDays(new Date(), 5 - i), "MMM dd"));
+  const sentData = labels.map(d => (sent.find(t => format(t.timestamp, "MMM dd") === d)?._sum?.amount || 0) / 100);
+  const receivedData = labels.map(d => (received.find(t => format(t.timestamp, "MMM dd") === d)?._sum?.amount || 0) / 100);
 
   return {
     balance: { amount: balance?.amount || 0, locked: balance?.locked || 0 },
     transfers,
     onRamps,
-    chartData: { labels, sentData, receivedData, onRampData },
+    pendingReturns, // NOW DEFINED
+    chartData: { labels, sentData, receivedData },
   };
 }
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
-    return <div className="p-6">Please log in to view your dashboard.</div>;
+    return <div className="p-6 text-zinc-400">Please log in.</div>;
   }
 
   const userId = Number(session.user.id);
-  const { balance, transfers, onRamps } = await getDashboardData(userId);
+  const { balance, transfers, onRamps, pendingReturns, chartData } = await getDashboardData(userId);
 
   return (
     <DashboardClient transfers={transfers}>
-      <div className="p-6 space-y-6 max-w-[calc(100vw-18rem)] mx-auto md:max-w-7xl">
-        {/* User Greeting */}
-        <div className="flex items-center space-x-4">
+      <div className="p-6 space-y-8 max-w-7xl mx-auto">
+        {/* Greeting */}
+        <div className="flex items-center gap-4">
           <Avatar>
-            <AvatarImage src={"https://github.com/shadcn.png"} />
-            <AvatarFallback>{session.user.name?.[0] || "U"}</AvatarFallback>
+            <AvatarImage src={session.user.name?.[0]} />
+            <AvatarFallback>{session.user.name?.[0] ?? "U"}</AvatarFallback>
           </Avatar>
-          <h1 className="text-2xl font-semibold ">
-            Welcome, {session.user.name || "User"}
+          <h1 className="text-2xl font-semibold text-zinc-100">
+            Hi, {session.user.name ?? "User"}
           </h1>
         </div>
 
-        {/* Top Section */} 
+        
+
+        {/* Balance + Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <BalanceCard amount={balance.amount} locked={balance.locked} />
           <StatsCards transfers={transfers} onRamps={onRamps} />
         </div>
+        {pendingReturns.length > 0 && (
+          <section className="bg-red-900/20 border border-red-700/50 rounded-xl p-6">
+            <h2 className="text-lg font-semibold text-red-400 mb-4">
+              Pending Returns ({pendingReturns.length})
+            </h2>
+            <ReturnPendingList returns={pendingReturns} />
+          </section>
+        )}
 
-        {/* Transfers & OnRamps */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <TransferList transfers={transfers} />
-          <OnRampList onRamps={onRamps} />
-        </div>
+        {/* Transaction History with Wrong Number Button */}
+        <section className="bg-zinc-800/50 backdrop-blur border border-zinc-700 rounded-xl p-6">
+          <h2 className="text-lg font-semibold text-zinc-100 mb-4">Recent Transactions</h2>
+          <P2PTransactionHistory />
+        </section>
 
         <Toaster position="top-right" />
       </div>

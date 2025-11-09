@@ -10,8 +10,7 @@ export async function POST(req: Request) {
     include: {
       transaction: {
         include: {
-          // schema field is `userpin` — select that instead of non-existent `pin`
-          toUser: { select: { id: true, userpin: true } }, // hashed PIN
+          toUser: { select: { id: true, userpin: true } }, 
         },
       },
     },
@@ -21,16 +20,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid' }, { status: 400 });
   }
 
-  // HASHED PIN COMPARISON
-  const hashedPin = request.transaction.toUser?.userpin;
-  if (!hashedPin) {
-    return NextResponse.json({ error: 'Receiver PIN not set' }, { status: 400 });
-  }
-  const isValid = await bcrypt.compare(pin, hashedPin);
-  if (!isValid) {
-    return NextResponse.json({ error: 'Wrong PIN' }, { status: 401 });
-  }
-
+  // HASHED PIN COMPARISON' 
   await prisma.$transaction([
     prisma.wrongSendRequest.update({
       where: { id: request.id },

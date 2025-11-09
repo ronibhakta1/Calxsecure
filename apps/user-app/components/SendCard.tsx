@@ -102,13 +102,12 @@ export function SendCard() {
     }
   }, [number, amount, router]);
 
-  const handlePinConfirm = useCallback(() => {
-    if (pin !== "1234") return void setPinError("Wrong PIN!");
-    setPinError("");
-    setShowPinModal(false);
-    setPin("");
-    handleSend();
-  }, [pin, handleSend]);
+  const handlePinConfirm = useCallback(async () => {
+  setPinError("");
+  setShowPinModal(false);
+  setPin("");
+  await handleSend(); 
+  }, [handleSend]);
 
   const openPinModal = useCallback(() => {
     setShowErrors(true);
