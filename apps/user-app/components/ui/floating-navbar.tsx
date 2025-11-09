@@ -22,7 +22,6 @@ export const FloatingNav = ({
   }[];
   className?: string;
 }) => {
-    const { theme , setTheme } = useTheme();
 
     const { data: session, status } = useSession();
       const router = useRouter();

@@ -1,14 +1,8 @@
+import React from "react";
 import { getP2PTransactions } from "@/app/lib/actions/getP2PTransactions";
-import { Button } from "@/components/ui/button";
-import { AlertTriangle, Clock } from "lucide-react";
 
 export async function P2PTransactionHistory() {
   const transactions = await getP2PTransactions();
-
-  const { getServerSession } = await import("next-auth");
-  const { authOptions } = await import("@/app/lib/auth");
-  const session = await getServerSession(authOptions);
-  const currentUserId = session?.user?.id ? Number(session.user.id) : null;
 
   if (!transactions.length) {
     return <div className="text-zinc-400">No transactions found.</div>;
