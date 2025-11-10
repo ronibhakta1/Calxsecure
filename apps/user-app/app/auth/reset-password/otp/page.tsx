@@ -9,6 +9,7 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
+import { Card } from "@/components/ui/card";
 
 const MAX_ATTEMPTS = 3;
 const BLOCK_DURATION_MS = 60_000;
@@ -100,10 +101,10 @@ export default function OTPPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-zinc-900 p-4">
+    <Card className="flex items-center justify-center min-h-screen p-4">
       <form
         onSubmit={handleVerify}
-        className="w-full max-w-md flex flex-col space-y-4 bg-zinc-800 p-6 rounded-lg text-white items-center justify-center"
+        className="w-full max-w-md flex flex-col space-y-4 p-6 rounded-lg items-center justify-center"
       >
         
         <h2 className="text-xl font-bold text-center">Enter OTP</h2>
@@ -136,7 +137,7 @@ export default function OTPPage() {
         <button
           type="submit"
           disabled={loading || !!blockedUntil}
-          className="w-full bg-zinc-500 py-2 rounded-md hover:bg-zinc-600 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full bg-zinc-400 py-2 rounded-md hover:bg-zinc-500 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? "Verifying..." : "Verify"}
         </button>
@@ -149,6 +150,6 @@ export default function OTPPage() {
           Resend OTP
         </button>
       </form>
-    </div>
+    </Card>
   );
 }

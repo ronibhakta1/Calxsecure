@@ -30,7 +30,7 @@ function InputWithError({ label, placeholder, value, onChange, error }: {
 }) {
   return (
     <div>
-      <TextInput label={label} placeholder={placeholder} onChange={onChange} />
+      <TextInput type="number" label={label} placeholder={placeholder} onChange={onChange} />
       {error && <div className="mt-2 border border-red-500 rounded-md p-2 bg-zinc-800"><p className="text-red-500 text-sm">{error}</p></div>}
     </div>
   );
@@ -62,7 +62,7 @@ function PinDialog({ open, setOpen, number, amount, pin, setPin, showPin, setSho
               {showPin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           </div>
-          {pinError && <div className="border border-red-500 rounded-md p-2 bg-zinc-800"><p className="text-red-500 text-sm">{pinError}</p></div>}
+          {pinError && <div className="border border-red-500 rounded-md p-2 "><p className="text-red-500 text-sm">{pinError}</p></div>}
           <Button onClick={onConfirm} disabled={pin.length !== 4 || loading}>
             {loading ? "Sending..." : "Send"}
           </Button>
@@ -102,13 +102,12 @@ export function SendCard() {
     }
   }, [number, amount, router]);
 
-  const handlePinConfirm = useCallback(() => {
-    if (pin !== "1234") return void setPinError("Wrong PIN!");
-    setPinError("");
-    setShowPinModal(false);
-    setPin("");
-    handleSend();
-  }, [pin, handleSend]);
+  const handlePinConfirm = useCallback(async () => {
+  setPinError("");
+  setShowPinModal(false);
+  setPin("");
+  await handleSend(); 
+  }, [handleSend]);
 
   const openPinModal = useCallback(() => {
     setShowErrors(true);
@@ -117,22 +116,22 @@ export function SendCard() {
 
   return (
     <div className="p-4 w-full max-w-md mx-auto">
-      <Card className="bg-zinc-800 border">
+      <Card className=" border-t">
         <CardHeader>
-          <CardTitle className="text-zinc-100">Send Money</CardTitle>
+          <CardTitle >Send Money</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4 text-zinc-100">
-          <InputWithError label="Mobile Number" placeholder="1111111111" value={number} onChange={setNumber} error={showErrors ? errors.number : undefined} />
-          <InputWithError label="Amount (INR)" placeholder="500" value={amount} onChange={setAmount} error={showErrors ? errors.amount : undefined} />
+        <CardContent className="space-y-4 ">
+          <InputWithError  label="Mobile Number" placeholder="1111111111" value={number} onChange={setNumber} error={showErrors ? errors.number : undefined} />
+          <InputWithError  label="Amount (INR)" placeholder="500" value={amount} onChange={setAmount} error={showErrors ? errors.amount : undefined} />
 
           <Dialog open={showPinModal} onOpenChange={setShowPinModal}>
             <DialogTrigger asChild>
               <Button
                 disabled={loading}
                 onClick={openPinModal}
-                className="w-full bg-zinc-600 hover:bg-zinc-500 disabled:bg-zinc-600/50 disabled:cursor-not-allowed"
+                className="w-full bg-zinc-400 hover:bg-zinc-500 disabled:bg-zinc-600/50 disabled:cursor-not-allowed"
               >
-                Pay INR{amount || 0}
+                Pay 
               </Button>
             </DialogTrigger>
             <PinDialog

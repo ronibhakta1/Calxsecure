@@ -1,12 +1,8 @@
 "use client";
 import { useSession } from "next-auth/react";
-import { BrickWallFire, Gift, Home, LayoutDashboard, Phone, Repeat, Send,} from 'lucide-react';
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from '../../../../packages/ui/src/avatar';
-import {  TooltipProvider, } from '../../../../packages/ui/src/tooltip';
+import { Home, LayoutDashboard, Send, Repeat, BrickWallFire, Wallet } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '../../../../packages/ui/src/avatar';
+import { TooltipProvider } from '../../../../packages/ui/src/tooltip';
 import { Sidebar, SidebarBody, SidebarLink, SignupBtn } from '../../../../packages/ui/src/sidebar';
 import { useMemo } from 'react';
 
@@ -16,23 +12,14 @@ interface Links {
   icon: React.JSX.Element;
 }
 
-const sidebarLinks: Links[] = [
-  { label: "Home", href: "/", icon: <Home className="w-5 h-5" /> },
-  { label: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="w-5 h-5" /> },
-  { label: "Transfer", href: "/transfer", icon: <Send className="w-5 h-5" /> },
-  { label: "P2P Transfer", href: "/p2p", icon: <Repeat className="w-5 h-5" /> },
-  { label: "Bills", href: "/bills", icon: <BrickWallFire className="w-5 h-5" /> },
-  { label: "Recharge", href: "/recharge", icon: <Phone className="w-5 h-5" /> },
-  { label: "Rewards", href: "/rewards", icon: <Gift className="w-5 h-5" /> },
-];
-  
-
-export default function Layout({
-  children,
-}: {
-  children: React.ReactNode;
-}): JSX.Element {
+export default function Layout({ children }: { children: React.ReactNode }) {
   const { data: session } = useSession();
+
+  const sidebarLinks = useMemo<Links[]>(() => [
+    { label: "Home", href: "/", icon: <Home className="w-5 h-5" /> },
+    { label: "QR", href: "/qr", icon: <LayoutDashboard className="w-5 h-5" /> },
+    { label: "Bills", href: "/bills", icon: <BrickWallFire className="w-5 h-5" /> },
+  ], []);
 
   return (
     <TooltipProvider>
@@ -56,7 +43,7 @@ export default function Layout({
                     {session?.user?.name || "Your Name"}
                   </p>
                   <p className="text-xs truncate">
-                    {session?.user?.number || "+1234567890"}
+                    {session?.user?.email || "abc@example.com"}
                   </p>
                 </div>
                 <SignupBtn />
@@ -65,7 +52,7 @@ export default function Layout({
           </SidebarBody>
         </Sidebar>
 
-        <main className="flex-1 overflow-y-auto bg-zinc-100 dark:bg-zinc-900 p-3 h-screen">
+        <main className="flex-1 overflow-y-auto bg-slate-950  h-screen">
           {children}
         </main>
       </div>

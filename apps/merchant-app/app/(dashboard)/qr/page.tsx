@@ -1,5 +1,4 @@
-
-import QRPaymentHero from "../../components/molecules/QRPaymentHero";
+import QRPaymentHero from "../../../components/molecules/QRPaymentHero";
 
 export default function QRCodePage() {
   

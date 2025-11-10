@@ -82,15 +82,15 @@ export function BillPaymentCard({ userId, schedules }: { userId: number; schedul
   };
 
   return (
-    <Card className="bg-white rounded-2xl shadow-xl w-full max-w-xl">
+    <Card className="ml-8 shadow-xl w-full max-w-md bg-zinc-300 dark:bg-zinc-700 dark:text-zinc-100 ">
       <CardHeader>
-        <CardTitle className="text-2xl font-bold text-gray-900">Schedule Bill Payment</CardTitle>
+        <CardTitle className="text-2xl font-bold ">Schedule Bill Payment</CardTitle>
       </CardHeader>
       <CardContent className=" space-y-2">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Bill Type</label>
-          <Select value={billType} onValueChange={setBillType}>
-            <SelectTrigger className="w-full bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 transition">
+        <div className="flex items-center justify-between">
+          <label className="w-1/3 text-sm font-medium  mb-2">Bill Type</label>
+          <Select  value={billType} onValueChange={setBillType}>
+            <SelectTrigger className=" border border-gray-200 rounded-lg focus:ring-2 focus:ring-zinc-500 transition">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -101,10 +101,10 @@ export function BillPaymentCard({ userId, schedules }: { userId: number; schedul
           </Select>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+        <div className="flex items-center justify-between">
+          <label className="w-1/3 text-sm font-medium  mb-2">Payment Method</label>
           <Select value={paymentMethod} onValueChange={setPaymentMethod}>
-            <SelectTrigger className="w-full bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 transition">
+            <SelectTrigger className="w-full border border-gray-200 rounded-lg focus:ring-2 focus:ring-zinc-500 transition">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -115,59 +115,59 @@ export function BillPaymentCard({ userId, schedules }: { userId: number; schedul
           </Select>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Provider</label>
+        <div className="flex items-center justify-between">
+          <label className="w-1/3 text-sm font-medium  mb-2">Provider</label>
           <Input
             placeholder="Enter provider name"
             value={provider}
             onChange={(e) => setProvider(e.target.value)}
-            className="bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 transition"
+            className="bg-zinc-400 border border-gray-200 rounded-lg focus:ring-2 focus:ring-zinc-500 transition"
           />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Account Number</label>
+        <div className="flex items-center justify-between">
+          <label className="w-1/3 text-sm font-medium  mb-2">Account Number</label>
           <Input
             placeholder="Enter account number"
             value={accountNo}
             onChange={(e) => setAccountNo(e.target.value)}
-            className="bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 transition"
+            className="bg-zinc-400 border border-gray-200 rounded-lg focus:ring-2 focus:ring-zinc-500 transition"
           />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Amount (₹)</label>
+        <div className="flex items-center justify-between">
+          <label className="w-1/3 text-sm font-medium  mb-2">Amount (₹)</label>
           <Input
             type="number"
             placeholder="Enter amount"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
-            className="bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 transition"
+            className="bg-zinc-400 border border-gray-200 rounded-lg focus:ring-2 focus:ring-zinc-500 transition"
           />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Merchant ID (Optional)</label>
+        <div className="flex items-center justify-between">
+          <label className="w-1/3 text-sm font-medium  mb-2">Merchant ID (Optional)</label>
           <Input
             type="number"
             placeholder="Enter merchant ID"
             value={merchantId}
             onChange={(e) => setMerchantId(e.target.value)}
-            className="bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 transition"
+            className="bg-zinc-400 border border-gray-200 rounded-lg focus:ring-2 focus:ring-zinc-500 transition"
           />
         </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Due Date</label>
+        <div className="flex items-center justify-between">
+          <label className="w-1/3 text-sm font-medium  mb-2">Due Date</label>
           <Input
             type="date"
             value={dueDate}
             onChange={(e) => setDueDate(e.target.value)}
-            className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-indigo-500 text-gray-700 transition"
+            className="w-full bg-zinc-400 border border-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-zinc-500 text-gray-700 transition"
           />
         </div>
         <div className="flex items-center justify-between">
-          <label className="text-sm text-gray-700">Recurring Payment</label>
+          <label className="w-1/3 text-sm ">Recurring Payment</label>
           <Switch
             checked={isRecurring}
             onCheckedChange={setIsRecurring}
-            className="data-[state=checked]:bg-indigo-600"
+            className="data-[state=checked]:bg-zinc-600"
           />
         </div>
 
@@ -175,7 +175,7 @@ export function BillPaymentCard({ userId, schedules }: { userId: number; schedul
           onClick={handleSchedule}
           disabled={isLoading}
           className={`w-full py-3 rounded-lg font-semibold text-white transition-colors duration-200 ${
-            isLoading ? "bg-indigo-400 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700"
+            isLoading ? "bg-zinc-400 cursor-not-allowed" : "bg-zinc-600 hover:bg-zinc-700"
           }`}
         >
           {isLoading ? "Processing..." : "Schedule Payment"}
@@ -184,7 +184,7 @@ export function BillPaymentCard({ userId, schedules }: { userId: number; schedul
         {message && (
           <div
             className={`p-4 rounded-lg text-sm font-medium ${
-              message.includes("✅") ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+              message.includes("") ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
             }`}
           >
             {message}

@@ -3,7 +3,6 @@ import { useState } from "react";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
@@ -59,16 +58,16 @@ export default function SignUpPage() {
 };
 
   return (
-    <div className="flex items-center justify-center  bg-zinc-900 p-2">
-      <Card className=" max-w-2xl shadow-lg bg-zinc-800 text-white flex flex-col items-center">
+    <div className="flex items-center justify-center p-2">
+      <Card className=" w-2xl shadow-lg    flex flex-col items-center">
         <CardHeader className="text-center ">
           <CardTitle className="font-bold">Create Account</CardTitle>
         </CardHeader>
         <CardContent>
           {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Profile picture</label>
+          <form onSubmit={handleSubmit} className="space-y-4 flex flex-col items-center">
+            <div className="flex items-center justify-between">
+              <label className="w-1/3 block text-sm font-medium mb-1">Profile picture</label>
               <input
                 type="file"
                 onChange={(e) => {
@@ -81,68 +80,67 @@ export default function SignUpPage() {
                     reader.readAsDataURL(file);
                   }
                 }}
-                className="p-2 border rounded-md hover:cursor-pointer"
+                className="p-2 w-1/2 border rounded-md hover:cursor-pointer"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">
+            <div className="flex items-center justify-between w-full">
+              <label className="w-1/2 block text-sm font-medium mb-1">
                 Full Name
               </label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full p-2 border rounded-md outline-none bg-zinc-700 text-white"
+                className="w-full p-2 border rounded-md outline-none "
                 placeholder="Enter name"
                 required
               />
             </div>
-            <div>
-              
-              <label className="block text-sm font-medium mb-1">
+            <div className="flex items-center justify-between w-full">
+              <label className="w-1/2 block text-sm font-medium mb-1">
                 Phone Number
               </label>
               <input
                 type="text"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
-                className="w-full p-2 border rounded-md outline-none bg-zinc-700 text-white"
+                className="w-full p-2 border rounded-md outline-none "
                 placeholder="Enter number"
                 required
               />
               
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">
+            <div className="flex items-center justify-between w-full">
+              <label className="w-1/2 block text-sm font-medium mb-1">
                 Email
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full p-2 border rounded-md outline-none bg-zinc-700 text-white"
+                className="w-full p-2 border rounded-md outline-none "
                 placeholder="Enter email"
               />
 
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Password</label>
+            <div className="flex items-center justify-between w-full">
+              <label className="w-1/2 block text-sm font-medium mb-1">Password</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full p-2 border rounded-md outline-none bg-zinc-700 text-white"
+                className="w-full p-2 border rounded-md outline-none "
                 placeholder="Enter password"
                 required
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Userpin</label>
+            <div className="flex items-center justify-between w-full">
+              <label className="w-1/2 block text-sm font-medium mb-1">Userpin</label>
               <input
                 type="password"
                 value={userPin}
                 onChange={(e) => setPin(e.target.value)}
-                className="w-full p-2 border rounded-md outline-none bg-zinc-700 text-white"
+                className="w-full p-2 border rounded-md outline-none "
                 placeholder="Enter pin"
                 required
               />
@@ -150,7 +148,7 @@ export default function SignUpPage() {
             
             <button
               type="submit"
-              className="w-full bg-zinc-500 text-white py-2 rounded-md hover:bg-zinc-600 transition"
+              className="w-2xl  bg-zinc-400 p-2 dark:bg-zinc-600 rounded-md hover:bg-zinc-600 transition"
             >
               Create Account
             </button>
@@ -162,7 +160,7 @@ export default function SignUpPage() {
           Already have an account?{" "}
           <a
             href="/auth/signin"
-            className="ml-1 text-zinc-500 hover:underline"
+            className="ml-1 text-zinc-500 hover:underline hover:text-zinc-900"
           >
             Sign In
           </a>

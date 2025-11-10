@@ -12,36 +12,19 @@ import roni from "@/public/roni.jpeg";
 import tan from "@/public/tan.jpeg";
 import nasir from "@/public/nasir.jpg";
 import vikas from "@/public/vikas.jpeg";
-import { FeaturesSectionDemo } from "../../components/ui/FeatureSection";
-import { ThreeDMarquee } from "../../../../packages/ui/src/3d-marquee";
-import pic1 from "@/public/pic1.844Z.png";
-import pic2 from "@/public/pic10.484Z.png";
-import pic3 from "@/public/pic11.447Z.png";
-import pic4 from "@/public/pic12.862Z.png";
-import pic5 from "@/public/pic3.825Z.png";
-import pic6 from "@/public/pic4.573Z.png";
-import pic7 from "@/public/pic5.812Z.png";
-import pic8 from "@/public/pic6.181Z.png";
-import pic9 from "@/public/pic7.950Z.png";
-import pic10 from "@/public/pic8.823Z.png";
-import pic11 from "@/public/pic9.290Z.png";
-import pic12 from "@/public/one.jpg";
-import pic13 from "@/public/four.png";
-import pic14 from "@/public/three.png";
-import pic15 from "@/public/two.png";
 import { PointerHighlight } from "../../components/ui/pointer-highlight";
-import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision";
-import { HeroParallax } from "@/components/ui/hero-parallax";
 import { ShootingStars } from "@/components/ui/shooting-stars";
 import { StarsBackground } from "@/components/ui/stars-background";
+import { BackgroundBeamsWithCollision } from "@/components/ui/background-beams-with-collision";
 
 const Page = () => {
   const navItems = [
-    { name: "Home", link: "/" },
     { name: "Dashboard", link: "/dashboard" },
     { name: "Transfer", link: "/transfer" },
     { name: "P2P", link: "/p2p" },
-    { name: "Settings", link: "/settings" },
+    { name: "Bills", link: "/bills" },
+    { name: "Recharge", link: "/recharge" },
+    { name: "Rewards", link: "/rewards" },
   ];
 
   const team = [
@@ -75,45 +58,6 @@ const Page = () => {
     },
   ];
 
-  const images = [
-    pic1.src,
-    pic10.src,
-    pic11.src,
-    pic13.src,
-    pic14.src,
-    pic15.src,
-    pic5.src,
-    pic12.src,
-    pic6.src,
-    pic7.src,
-    pic8.src,
-    pic9.src,
-    pic1.src,
-    pic10.src,
-    pic11.src,
-    pic4.src,
-    pic12.src,
-    pic11.src,
-    pic4.src,
-    pic13.src,
-    pic14.src,
-    pic15.src,
-    pic2.src,
-    pic3.src,
-    pic5.src,
-    pic6.src,
-    pic4.src,
-    pic12.src,
-    pic11.src,
-    pic4.src,
-    pic13.src,
-    pic14.src,
-    pic15.src,
-    pic2.src,
-    pic3.src,
-    pic5.src,
-    pic6.src,
-  ];
   const S1 = [
     {
       icon: "🔐",
@@ -134,61 +78,6 @@ const Page = () => {
       icon: "🌐",
       title: "Global Compliance",
       description: "PCI DSS & GDPR certified",
-    },
-  ];
-  const products = [
-    {
-      title: "Renderwork Studio",
-      link: "https://renderwork.studio",
-      thumbnail: pic11.src,
-    },
-    {
-      title: "Creme Digital",
-      link: "https://cremedigital.com",
-      thumbnail: pic12.src,
-    },
-    {
-      title: "Invoker Labs",
-      link: "https://invoker.lol",
-      thumbnail: pic14.src,
-    },
-    {
-      title: "Golden Bells Academy",
-      link: "https://goldenbellsacademy.com",
-      thumbnail: pic13.src,
-    },
-
-    {
-      title: "E Free Invoice",
-      link: "https://efreeinvoice.com",
-      thumbnail: pic15.src,
-    },
-    {
-      title: "Moonbeam",
-      link: "https://gomoonbeam.com",
-      thumbnail: pic14.src,
-    },
-
-    {
-      title: "Algochurn",
-      link: "https://algochurn.com",
-      thumbnail: pic7.src,
-    },
-    {
-      title: "Aceternity UI",
-      link: "https://ui.aceternity.com",
-      thumbnail: pic8.src,
-    },
-
-    {
-      title: "Cursor",
-      link: "https://cursor.so",
-      thumbnail: pic2.src,
-    },
-    {
-      title: "Rogue",
-      link: "https://userogue.com",
-      thumbnail: pic3.src,
     },
   ];
 

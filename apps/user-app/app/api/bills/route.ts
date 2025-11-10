@@ -1,8 +1,10 @@
-import { NextResponse } from "next/server";
+
 import { PrismaClient } from "@prisma/client";
+import { NextResponse } from "next/server";
+
 import { v4 as uuidv4 } from "uuid";
 
-const prisma = new PrismaClient();
+const prismaClient = new PrismaClient();
 
 async function processBankPayment(billData: any) {
   try {
@@ -22,7 +24,8 @@ async function processBankPayment(billData: any) {
     });
 
     if (!webhookResponse.ok) {
-      throw new Error("Failed to initiate bank payment");
+      console.error("Bank webhook failed:", await webhookResponse.text());
+      throw new Error("Bank payment initiation failed");
     }
 
     return { status: "PENDING", token };
@@ -34,49 +37,63 @@ async function processBankPayment(billData: any) {
 
 export async function POST(request: Request) {
   try {
+    const body = await request.json();
     const {
       userId,
       billType,
       provider,
       accountNo,
-      amount,
+      amount, // in rupees
       dueDate,
       isRecurring,
       paymentMethod,
       merchantId,
-    } = await request.json();
+    } = body;
 
-    // Basic validation
+    // VALIDATION
     if (!userId || !billType || !provider || !accountNo || !amount || !dueDate || !paymentMethod) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
     }
 
-    const billTypeEnum = ["ELECTRICITY", "WATER", "GAS", "PHONE_RECHARGE", "DTH"];
-    if (!billTypeEnum.includes(billType)) {
-      return NextResponse.json({ error: "Invalid bill type" }, { status: 400 });
+    const amountInPaise = Math.round(Number(amount) * 100);
+    if (isNaN(amountInPaise) || amountInPaise <= 0) {
+      return NextResponse.json({ error: "Invalid amount" }, { status: 400 });
     }
 
-    // Validate userId and merchantId (if provided)
-    const user = await prisma.user.findUnique({ where: { id: parseInt(userId) } });
+    // Validate user
+    const user = await prismaClient.user.findUnique({ where: { id: Number(userId) } });
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
-    if (merchantId && !(await prisma.merchant.findUnique({ where: { id: parseInt(merchantId) } }))) {
-      return NextResponse.json({ error: "Merchant not found" }, { status: 404 });
+
+    // Optional merchant
+    if (merchantId) {
+      const merchant = await prismaClient.merchant.findUnique({ where: { id: Number(merchantId) } });
+      if (!merchant) {
+        return NextResponse.json({ error: "Merchant not found" }, { status: 404 });
+      }
     }
 
-    const nextPayment = isRecurring ? new Date(new Date(dueDate).setMonth(new Date(dueDate).getMonth() + 1)) : null;
+    const dueDateObj = new Date(dueDate);
+    if (isNaN(dueDateObj.getTime())) {
+      return NextResponse.json({ error: "Invalid due date" }, { status: 400 });
+    }
+
+    // Calculate next payment
+    const nextPayment = isRecurring
+      ? new Date(dueDateObj.getFullYear(), dueDateObj.getMonth() + 1, dueDateObj.getDate())
+      : null;
 
     // Create bill
-    const bill = await prisma.billSchedule.create({
+    const bill = await prismaClient.billSchedule.create({
       data: {
-        userId: parseInt(userId),
-        merchantId: merchantId ? parseInt(merchantId) : null,
+        userId: Number(userId),
+        merchantId: merchantId ? Number(merchantId) : null,
         billType,
         provider,
         accountNo,
-        amount: parseInt(amount),
-        dueDate: new Date(dueDate),
+        amount: amountInPaise,
+        dueDate: dueDateObj,
         nextPayment,
         paymentMethod,
         status: "PENDING",
@@ -84,19 +101,32 @@ export async function POST(request: Request) {
       },
     });
 
-    // Send to bank webhook
-    const paymentResult = await processBankPayment(bill);
+    // Send to bank
+    try {
+      const paymentResult = await processBankPayment({
+        ...bill,
+        amount: amountInPaise,
+      });
 
-    // Update bill with token
-    const updatedBill = await prisma.billSchedule.update({
-      where: { id: bill.id },
-      data: { token: paymentResult.token },
-    });
+      await prismaClient.billSchedule.update({
+        where: { id: bill.id },
+        data: { token: paymentResult.token },
+      });
+    } catch (err) {
+      console.error("Bank webhook failed, but bill saved:", err);
+      // Still return success — user can retry payment later
+    }
 
-    return NextResponse.json({ message: "Bill scheduled successfully", bill: updatedBill }, { status: 201 });
-  } catch (error) {
+    return NextResponse.json(
+      { message: "Bill scheduled successfully!", bill },
+      { status: 201 }
+    );
+  } catch (error: any) {
     console.error("Error scheduling bill:", error);
-    return NextResponse.json({ error: "Failed to schedule bill" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Failed to schedule bill: " + error.message },
+      { status: 500 }
+    );
   }
 }
 
@@ -108,8 +138,8 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Missing userId" }, { status: 400 });
     }
 
-    const bills = await prisma.billSchedule.findMany({
-      where: { userId: parseInt(userId) },
+    const bills = await prismaClient.billSchedule.findMany({
+      where: { userId: Number(userId) },
       orderBy: { dueDate: "asc" },
     });
 

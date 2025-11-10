@@ -9,8 +9,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "./dropdo
 import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
 import { TextHoverEffect } from "../../../../packages/ui/src/text-hover-effect";
 import { useTheme } from "next-themes";
-import { Moon, Sun } from "lucide-react";
-import { Button } from "./button";
+import Link from "next/link";
 
 export const FloatingNav = ({
   navItems,
@@ -52,7 +51,7 @@ export const FloatingNav = ({
       >
         <TextHoverEffect text="CalxSecure" />
         {navItems.map((navItem, idx) => (
-          <a
+          <Link
             key={`link-${idx}`}
             href={navItem.link}
             className={cn(
@@ -61,7 +60,7 @@ export const FloatingNav = ({
           >
             {navItem.icon && <span className="block sm:hidden">{navItem.icon}</span>}
             <span className="hidden sm:block text-sm">{navItem.name}</span>
-          </a>
+          </Link>
         ))}
 
         { status === "unauthenticated" && (
@@ -87,18 +86,7 @@ export const FloatingNav = ({
             </DropdownMenuContent>
 
           </DropdownMenu>
-
           
-        )}
-
-        {theme === "light" ? (
-          <Button onClick={() => setTheme("dark")}   >
-            <Sun className="absolute h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:rotate-90 " />
-          </Button>
-        ) : (
-          <Button onClick={() => setTheme("light")} >
-            <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0 " />
-          </Button>
         )}
 
         

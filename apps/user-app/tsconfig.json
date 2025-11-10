@@ -7,11 +7,11 @@
       }
     ],
     "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "paths": {
       "@/*": ["./*"]
     },
-    "strictNullChecks": true,
-    "ignoreDeprecations": "6.0"
+    "strictNullChecks": true
   },
   "include": [
     "next-env.d.ts",

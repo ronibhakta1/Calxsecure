@@ -16,6 +16,8 @@
   "devDependencies": {
     "@repo/eslint-config": "*",
     "@repo/typescript-config": "*",
+    "eslint-config-turbo": "^2.6.0",
+    "eslint-plugin-turbo": "^2.6.0",
     "prettier": "^3.2.5",
     "turbo": "latest"
   },
@@ -31,6 +33,7 @@
     "@repo/store": "^1.0.0",
     "clsx": "^2.1.1",
     "esbuild": "0.25.10",
+    "firebase": "^12.5.0",
     "lucide-react": "^0.543.0",
     "tailwind-merge": "^3.3.1",
     "webpack": "^5.101.3"
