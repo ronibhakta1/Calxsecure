@@ -31,8 +31,10 @@ model User {
   referralsAsReferrer  Referral[]       @relation("Referrer")
   referralsAsReferred Referral[]        @relation("Referred")
   wrongSendRequests   WrongSendRequest[] @relation("UserWrongSendRequests")
-  
 
+  // added opposite relation fields
+  createdGroups     BillSplitGroup[]    @relation("CreatedGroups")
+  billSplitMembers  BillSplitMember[]
 }
 
 model p2pTransfer {
@@ -47,6 +49,9 @@ model p2pTransfer {
   status            String            @default("SUCCESS") // SUCCESS, REFUND_PENDING, REFUNDED
   razorpayPaymentId String?           @unique
   wrongSendRequest  WrongSendRequest?
+
+  // opposite relation for BillSplitPayment.p2pTransfer
+  billSplitPayment  BillSplitPayment?
 }
 model Merchant {
   id               Int               @id @default(autoincrement())
@@ -97,6 +102,10 @@ model P2PRequest {
   status       P2PRequestStatus @default(PENDING)
   createdAt    DateTime @default(now())
   settledAt    DateTime?
+
+  // opposite relation for BillSplitMember.request
+  billSplitMemberId Int? @unique
+  billSplitMember   BillSplitMember? @relation(fields: [billSplitMemberId], references: [id])
   
   @@map("p2p_requests")
 }
@@ -167,6 +176,10 @@ model Reward {
   metadata     Json?
   user         User     @relation(fields: [userId], references: [id])
 
+  // opposite relation for BillSplitGroup.rewards
+  billSplitGroupId Int?
+  billSplitGroup   BillSplitGroup? @relation(fields: [billSplitGroupId], references: [id])
+
   @@index([userId])
   @@index([type])
 }
@@ -196,6 +209,51 @@ model WrongSendRequest {
   transaction      p2pTransfer @relation(fields: [txnId], references: [id])
 
   @@index([status])
+}
+
+model BillSplitGroup {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  totalAmount Int      // in paise
+  currency    String   @default("INR")
+  createdById Int
+  createdBy   User     @relation("CreatedGroups", fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+  settledAt   DateTime?
+  status      String   @default("PENDING") // PENDING, SETTLED, CANCELLED
+  members     BillSplitMember[]
+  payments    BillSplitPayment[]
+  rewards     Reward[] // bonus when fully settled
+}
+
+model BillSplitMember {
+  id         Int             @id @default(autoincrement())
+  groupId    Int
+  group      BillSplitGroup  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId     Int?
+  user       User?           @relation(fields: [userId], references: [id])
+  phone      String?         // fallback if not registered
+  name       String
+  share      Int             // in paise
+  paid       Boolean         @default(false)
+  paidAt     DateTime?
+  paidAmount Int             @default(0)
+  request    P2PRequest?     // auto-created request
+
+  // opposite relation for BillSplitPayment.member
+  payments   BillSplitPayment[]
+}
+model BillSplitPayment {
+  id         Int            @id @default(autoincrement())
+  groupId    Int
+  group      BillSplitGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  memberId   Int
+  member     BillSplitMember @relation(fields: [memberId], references: [id])
+  p2pTransferId Int? @unique
+  p2pTransfer   p2pTransfer?  @relation(fields: [p2pTransferId], references: [id])
+  amount     Int
+  paidAt     DateTime       @default(now())
 }
 enum WrongSendStatus {
   PENDING
