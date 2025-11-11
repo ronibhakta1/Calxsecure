@@ -1,11 +1,13 @@
+
 import { NextResponse } from "next/server";
 import db from "@repo/db/client";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
-import { triggerRechargeRewards } from "@/app/lib/rewards";
-import prisma from "@repo/db/client";
+import { triggerRechargeRewards } from "@/app/lib/rewardEngine";
 
 export async function POST(req: Request) {
+  console.log("RECHARGE API CALLED");
+
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
@@ -13,46 +15,42 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json();
-    const {
-      userId,
-      mobileNumber,
-      operator,
-      circle,
-      planId,
-      userpin,
-    } = body;
+    const { userId, mobileNumber, operator, circle, planId, userpin } = body;
 
-    // ---------- validation ----------
-    if (!userId || !mobileNumber || !operator || !circle || !planId || !userpin) {
-      return NextResponse.json({ success: false, error: "All fields required" }, { status: 400 });
-    }
-    if (mobileNumber.length !== 10) {
-      return NextResponse.json({ success: false, error: "Invalid mobile number" }, { status: 400 });
+    if (!userId || !mobileNumber || !planId || !userpin) {
+      return NextResponse.json({ success: false, error: "Missing fields" }, { status: 400 });
     }
 
-    // ---------- user + balance ----------
     const user = await db.user.findUnique({
       where: { id: Number(userId) },
-      select: { id: true, Balance: { select: { amount: true } }, userpin: true },
+      include: { Balance: true },
     });
-    if (!user) return NextResponse.json({ success: false, error: "User not found" }, { status: 404 });
-    if (user.userpin !== userpin) return NextResponse.json({ success: false, error: "Incorrect PIN" }, { status: 403 });
+
+    if (!user || user.userpin !== userpin) {
+      return NextResponse.json({ success: false, error: "Wrong PIN" }, { status: 403 });
+    }
 
     const plan = await db.rechargePlan.findUnique({
       where: { id: planId },
     });
-    if (!plan || plan.operator !== operator || plan.circle !== circle) {
-      return NextResponse.json({ success: false, error: "Invalid plan" }, { status: 400 });
+
+    if (!plan) {
+      return NextResponse.json({ success: false, error: "Plan not found" }, { status: 404 });
     }
 
-    const balanceInPaise = Number(user.Balance[0]?.amount ?? 0);
-    if (balanceInPaise < plan.amount * 100) {
+    const balancePaise = user.Balance?.[0]?.amount ?? 0;
+    if (balancePaise < plan.amount * 100) {
       return NextResponse.json({ success: false, error: "Insufficient balance" }, { status: 400 });
     }
 
-    // ---------- transaction ----------
-    const [order] = await db.$transaction([
-      db.rechargeOrder.create({
+    // CORRECT WAY TO UPDATE BALANCE
+    await db.$transaction(async (tx) => {
+      await tx.balance.update({
+        where: { userId: Number(userId) },
+        data: { amount: { decrement: plan.amount * 100 } },
+      });
+
+      await tx.rechargeOrder.create({
         data: {
           userId: Number(userId),
           mobileNumber,
@@ -61,28 +59,36 @@ export async function POST(req: Request) {
           amount: plan.amount,
           status: "SUCCESS",
           planId: plan.id,
-          orderId: `RECH-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+          orderId: `RECH-${Date.now()}`,
         },
-      }),
-      db.user.update({
-        where: { id: Number(userId) },
-        data: { Balance: { updateMany: { where: {}, data: { amount: { decrement: plan.amount * 100 } } } } },
-      }),
-    ]);
-    const isFirstRecharge = !(await prisma.rechargeOrder.findFirst({ where: { userId: Number(userId) } }));
+      });
+    });
+
+    // Count recharges for rewards
+    const totalRecharges = await db.rechargeOrder.count({
+      where: { userId: Number(userId), status: "SUCCESS" },
+    });
+    const isFirstRecharge = totalRecharges === 1;
+
     await triggerRechargeRewards(Number(userId), plan.amount, isFirstRecharge);
 
-    // ---------- return new balance ----------
-    const newBalance = (balanceInPaise - plan.amount * 100) / 100;
+    const newBalance = (balancePaise - plan.amount * 100) / 100;
+
+    // Find latest reward
+    const latestReward = await db.reward.findFirst({
+      where: { userId: Number(userId) },
+      orderBy: { earnedAt: "desc" },
+    });
 
     return NextResponse.json({
       success: true,
-      message: "Recharge successful!",
-      newBalance,               // <-- NEW
-      orderId: order.id,
+      newBalance,
+      reward: latestReward
+        ? { type: latestReward.type, amount: Number(latestReward.amount) }
+        : null,
     });
-  } catch (e) {
-    console.error(e);
+  } catch (e: any) {
+    console.error("Recharge error:", e);
     return NextResponse.json({ success: false, error: "Server error" }, { status: 500 });
   }
 }

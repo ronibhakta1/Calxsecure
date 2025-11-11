@@ -1,58 +1,79 @@
+
 'use client';
+
 import { useEffect, useState, useCallback, useRef } from 'react';
 import axios from 'axios';
-import toast from 'react-hot-toast';
+import toast, { Toaster } from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Timer, AlertTriangle, Lock, Eye, EyeOff, CheckCircle } from 'lucide-react';
 import confetti from 'canvas-confetti';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+
+interface WrongSendRequest {
+  id: string;
+  amount: number;
+  senderName: string;
+  expiresAt: string;
+}
+
+type Stage = 'info' | 'pin' | 'success';
 
 export default function ReturnPage({ params }: { params: { id: string } }) {
-  const [request, setRequest] = useState<any>(null);
+  const [request, setRequest] = useState<WrongSendRequest | null>(null);
   const [timeLeft, setTimeLeft] = useState(0);
   const [showPin, setShowPin] = useState(false);
   const [pin, setPin] = useState('');
   const [pinInvalid, setPinInvalid] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [stage, setStage] = useState<'info' | 'pin' | 'success'>('info');
+  const [stage, setStage] = useState<Stage>('info');
   const pinInputRef = useRef<HTMLInputElement>(null);
 
-  // Fetch request
+  // Fetch request data
   useEffect(() => {
-    axios.get(`/api/wrong-send/${params.id}`)
-      .then(res => {
-        setRequest(res.data);
-        const diff = new Date(res.data.expiresAt).getTime() - Date.now();
-        setTimeLeft(Math.max(0, diff));
-      })
-      .catch(() => toast.error('Invalid or expired link'));
+    const fetchRequest = async () => {
+      try {
+        const res = await axios.get(`/api/wrong-send/${params.id}`);
+        const data = res.data;
+        setRequest(data);
+        const diff = new Date(data.expiresAt).getTime() - Date.now();
+        setTimeLeft(Math.max(0, Math.floor(diff / 1000) * 1000));
+      } catch (err) {
+        toast.error('Invalid or expired link');
+      }
+    };
+    fetchRequest();
   }, [params.id]);
 
-  // Timer
+  // Timer countdown
   useEffect(() => {
     if (timeLeft <= 0) return;
-    const timer = setInterval(() => setTimeLeft(t => Math.max(0, t - 1000)), 1000);
-    return () => clearInterval(timer);
+    const interval = setInterval(() => {
+      setTimeLeft(prev => {
+        const next = prev - 1000;
+        return next < 0 ? 0 : next;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
   }, [timeLeft]);
 
-  // Focus PIN on open
+  // Auto-focus PIN input
   useEffect(() => {
     if (stage === 'pin' && pinInputRef.current) {
       pinInputRef.current.focus();
+      pinInputRef.current.select();
     }
   }, [stage]);
 
-  const formatTime = (ms: number) => {
-    const h = String(Math.floor(ms / 3600000)).padStart(2, '0');
-    const m = String(Math.floor((ms % 3600000) / 60000)).padStart(2, '0');
-    const s = String(Math.floor((ms % 60000) / 1000)).padStart(2, '0');
+  const formatTime = (ms: number): string => {
+    const totalSeconds = Math.floor(ms / 1000);
+    const h = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+    const m = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+    const s = String(totalSeconds % 60).padStart(2, '0');
     return `${h}:${m}:${s}`;
   };
 
-  const handleReturn = useCallback(() => {
-    setStage('pin');
-  }, []);
+  const handleReturn = () => setStage('pin');
 
   const handlePinConfirm = useCallback(async () => {
     if (pin.length !== 4) {
@@ -62,151 +83,215 @@ export default function ReturnPage({ params }: { params: { id: string } }) {
 
     setLoading(true);
     try {
-      await axios.post('/api/wrong-send/approve', { requestId: params.id, pin });
-      confetti({ particleCount: 120, spread: 70, origin: { y: 0.6 } });
+      await axios.post('/api/wrong-send/approve', {
+        requestId: params.id,
+        pin,
+      });
+      confetti({
+        particleCount: 150,
+        spread: 80,
+        origin: { y: 0.6 },
+        colors: ['#10b981', '#34d399', '#86efac', '#d9f99d'],
+      });
       setStage('success');
     } catch (err: any) {
-      toast.error(err.response?.data?.error || 'Wrong PIN');
+      toast.error(err.response?.data?.error || 'Wrong PIN. Try again.');
       setPin('');
       setPinInvalid(true);
+      pinInputRef.current?.focus();
     } finally {
       setLoading(false);
     }
   }, [pin, params.id]);
 
-  if (!request) return (
-    <div className="min-h-screen bg-gradient-to-br from-zinc-900 to-zinc-800 flex items-center justify-center p-4">
-      <Card className="bg-zinc-800 border-zinc-700 p-8 text-center">
-        <p className="text-zinc-400">Loading...</p>
-      </Card>
-    </div>
-  );
-
-  if (stage === 'success') return (
-    <div className="min-h-screen bg-gradient-to-br from-green-900 to-zinc-900 flex items-center justify-center p-4">
-      <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ type: "spring", stiffness: 200 }}
-      >
-        <Card className="bg-zinc-800 border-green-700 p-8 text-center max-w-md w-full">
-          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-          <CardTitle className="text-2xl text-green-400 mb-2">₹{request.amount} Returned!</CardTitle>
-          <p className="text-zinc-300">Money sent back to {request.senderName}</p>
+  if (!request) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-zinc-900 to-zinc-950 flex items-center justify-center p-4">
+        <Card className="bg-zinc-800/90 border-zinc-700 p-10">
+          <div className="animate-pulse text-center">
+            <div className="w-12 h-12 border-4 border-zinc-600 border-t-white rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-zinc-400">Loading request...</p>
+          </div>
         </Card>
-      </motion.div>
-    </div>
-  );
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-900 via-zinc-900 to-zinc-800 flex items-center justify-center p-4">
-      <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        className="w-full max-w-md"
-      >
-        <Card className="bg-zinc-800/95 backdrop-blur border-red-800/50 shadow-2xl">
-          {stage === 'info' ? (
-            <>
-              <CardHeader className="text-center pb-6">
-                <motion.div
-                  animate={{ rotate: [0, -5, 5, -5, 0] }}
-                  transition={{ repeat: Infinity, duration: 2 }}
-                >
-                  <AlertTriangle className="w-14 h-14 text-red-500 mx-auto mb-3" />
-                </motion.div>
-                <CardTitle className="text-2xl text-white">
-                  {request.senderName} sent you
-                </CardTitle>
-                <p className="text-5xl font-bold text-green-400 mt-2">₹{request.amount}</p>
-                <CardDescription className="text-zinc-400 mt-1">
-                  by mistake
-                </CardDescription>
-              </CardHeader>
-
-              <CardContent className="space-y-6">
-                <div className="bg-red-900/30 border border-red-700/50 rounded-xl p-5 text-center">
-                  <div className="flex items-center justify-center gap-3 text-4xl font-mono text-red-400">
-                    <Timer className="w-9 h-9 animate-pulse" />
-                    {formatTime(timeLeft)}
-                  </div>
-                  <p className="text-sm text-red-300 mt-3">
-                    Return now or <span className="font-bold">₹50 fee</span> after 24h
+    <>
+      <Toaster position="top-center" />
+      <div className="min-h-screen bg-gradient-to-br from-red-950 via-zinc-900 to-zinc-950 flex items-center justify-center p-4">
+        <AnimatePresence mode="wait">
+          {stage === 'success' ? (
+            <motion.div
+              key="success"
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+              className="w-full max-w-md"
+            >
+              <Card className="bg-gradient-to-br from-green-900/50 to-zinc-900/80 backdrop-blur border-green-700/50 shadow-2xl">
+                <CardContent className="p-10 text-center">
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.2, type: 'spring' }}
+                  >
+                    <CheckCircle className="w-20 h-20 text-green-400 mx-auto mb-6" />
+                  </motion.div>
+                  <CardTitle className="text-3xl font-bold text-green-400 mb-3">
+                    ₹{request.amount} Returned!
+                  </CardTitle>
+                  <p className="text-zinc-300 text-lg">
+                    Successfully sent back to <span className="font-semibold">{request.senderName}</span>
                   </p>
-                </div>
-
-                <Button
-                  onClick={handleReturn}
-                  disabled={timeLeft === 0}
-                  className="w-full h-14 text-lg font-semibold bg-green-600 hover:bg-green-700 disabled:bg-zinc-700 disabled:text-zinc-500"
-                >
-                  {timeLeft === 0 ? '₹50 Penalty Applied' : 'Return Money Now'}
-                </Button>
-              </CardContent>
-            </>
+                  <p className="text-sm text-zinc-500 mt-6">You can close this page now.</p>
+                </CardContent>
+              </Card>
+            </motion.div>
           ) : (
-            <>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-white">
-                  <Lock className="w-5 h-5" />
-                  Confirm with PIN
-                </CardTitle>
-                <CardDescription className="text-zinc-400">
-                  Enter your 4-digit PIN to return ₹{request.amount}
-                </CardDescription>
-              </CardHeader>
+            <motion.div
+              key="form"
+              initial={{ y: 30, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -30, opacity: 0 }}
+              className="w-full max-w-md"
+            >
+              <Card className="bg-zinc-800/95 backdrop-blur-xl border-red-800/40 shadow-2xl overflow-hidden">
+                {stage === 'info' ? (
+                  <>
+                    <CardHeader className="text-center pb-6 pt-8">
+                      <motion.div
+                        animate={{ rotate: [0, -8, 8, -8, 0] }}
+                        transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+                      >
+                        <AlertTriangle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+                      </motion.div>
+                      <CardTitle className="text-2xl text-white">
+                        {request.senderName} sent you
+                      </CardTitle>
+                      <p className="text-6xl font-bold text-green-400 mt-3 tracking-tight">
+                        ₹{request.amount}
+                      </p>
+                      <CardDescription className="text-zinc-400 text-lg mt-2">
+                        by mistake
+                      </CardDescription>
+                    </CardHeader>
 
-              <CardContent>
-                <div className="relative">
-                  <input
-                    ref={pinInputRef}
-                    type={showPin ? 'text' : 'password'}
-                    value={pin}
-                    onChange={(e) => {
-                      setPin(e.target.value.slice(0, 4));
-                      setPinInvalid(false);
-                    }}
-                    placeholder="••••"
-                    maxLength={4}
-                    className={`w-full text-center text-2xl tracking-widest font-mono bg-zinc-700 border ${
-                      pinInvalid ? 'border-red-500' : 'border-zinc-600'
-                    } rounded-lg p-4 text-white placeholder-zinc-500`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPin(!showPin)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
-                  >
-                    {showPin ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                  </button>
-                </div>
+                    <CardContent className="space-y-8 pb-10">
+                      <div className="bg-red-900/40 border border-red-700/60 rounded-2xl p-6 text-center">
+                        <div className="flex items-center justify-center gap-4 text-5xl font-mono font-bold text-red-400">
+                          <Timer className="w-12 h-12 animate-pulse" />
+                          {formatTime(timeLeft)}
+                        </div>
+                        <p className="text-red-300 mt-4 text-sm">
+                          Return now to avoid <span className="font-bold text-red-200">₹50 penalty</span> after 24h
+                        </p>
+                      </div>
 
-                {pinInvalid && (
-                  <p className="text-red-400 text-sm text-center mt-2">Wrong PIN</p>
+                      <Button
+                        onClick={handleReturn}
+                        disabled={timeLeft === 0}
+                        size="lg"
+                        className="w-full h-16 text-xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 disabled:from-zinc-700 disabled:to-zinc-800 shadow-lg"
+                      >
+                        {timeLeft === 0 ? '₹50 Penalty Applied' : 'Return Money Now'}
+                      </Button>
+                    </CardContent>
+                  </>
+                ) : (
+                  <>
+                    <CardHeader className="pb-4">
+                      <CardTitle className="flex items-center gap-3 text-white text-xl">
+                        <Lock className="w-6 h-6 text-yellow-500" />
+                        Confirm with PIN
+                      </CardTitle>
+                      <CardDescription className="text-zinc-400">
+                        Enter your 4-digit PIN to return ₹{request.amount}
+                      </CardDescription>
+                    </CardHeader>
+
+                    <CardContent className="space-y-6">
+                      <div className="relative">
+                        <input
+                          ref={pinInputRef}
+                          type={showPin ? 'text' : 'password'}
+                          value={pin}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/\D/g, '').slice(0, 4);
+                            setPin(value);
+                            setPinInvalid(false);
+                          }}
+                          onKeyDown={(e) => e.key === 'Enter' && pin.length === 4 && handlePinConfirm()}
+                          placeholder="••••"
+                          className={`w-full text-center text-3xl tracking-widest font-mono bg-zinc-700/50 border-2 ${
+                            pinInvalid ? 'border-red-500 shake' : 'border-zinc-600'
+                          } rounded-xl p-5 text-white placeholder-zinc-500 focus:border-yellow-500 focus:outline-none transition-all`}
+                          inputMode="numeric"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPin(!showPin)}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition"
+                        >
+                          {showPin ? <EyeOff className="w-6 h-6" /> : <Eye className="w-6 h-6" />}
+                        </button>
+                      </div>
+
+                      <AnimatePresence>
+                        {pinInvalid && (
+                          <motion.p
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0 }}
+                            className="text-red-400 text-center font-medium"
+                          >
+                            Wrong PIN. Please try again.
+                          </motion.p>
+                        )}
+                      </AnimatePresence>
+
+                      <div className="flex gap-4">
+                        <Button
+                          variant="outline"
+                          onClick={() => {
+                            setStage('info');
+                            setPin('');
+                            setPinInvalid(false);
+                          }}
+                          disabled={loading}
+                          className="flex-1"
+                        >
+                          Back
+                        </Button>
+                        <Button
+                          onClick={handlePinConfirm}
+                          disabled={pin.length !== 4 || loading}
+                          className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 font-semibold"
+                          size="lg"
+                        >
+                          {loading ? 'Returning...' : `Return ₹${request.amount}`}
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </>
                 )}
-
-                <div className="flex gap-3 mt-6">
-                  <Button
-                    variant="outline"
-                    onClick={() => setStage('info')}
-                    className="flex-1"
-                    disabled={loading}
-                  >
-                    Back
-                  </Button>
-                  <Button
-                    onClick={handlePinConfirm}
-                    disabled={pin.length !== 4 || loading}
-                    className="flex-1 bg-green-600 hover:bg-green-700"
-                  >
-                    {loading ? 'Returning...' : `Return ₹${request.amount}`}
-                  </Button>
-                </div>
-              </CardContent>
-            </>
+              </Card>
+            </motion.div>
           )}
-        </Card>
-      </motion.div>
-    </div>
+        </AnimatePresence>
+      </div>
+
+      <style jsx>{`
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+          20%, 40%, 60%, 80% { transform: translateX(4px); }
+        }
+        .shake {
+          animation: shake 0.5s ease-in-out;
+        }
+      `}</style>
+    </>
   );
 }

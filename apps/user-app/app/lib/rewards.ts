@@ -1,41 +1,36 @@
-import prisma from '@repo/db/client';
 
-export async function triggerRechargeRewards(userId: number, rechargeAmount: number, isFirst: boolean) {
-  const cashback = Math.floor(rechargeAmount * 0.05);
-  const cashbackPaise = Math.floor(cashback * 100); // use number (Int) — Prisma Int expects number
 
-  await prisma.$transaction([
-    // 1) Cashback reward record
-    prisma.reward.create({
-      data: {
-        userId,
-        type: 'CASHBACK',
-        amount: cashbackPaise,
-        status: 'CLAIMED',
-        metadata: { rechargeAmount },
-      },
-    }),
+import { RewardStatus } from '@prisma/client'
+import prisma from '@repo/db/client'
 
-    // 2) Credit the user's Balance (update Balance model directly — Balance is a separate model)
-    prisma.balance.update({
+export async function getRewardsForUser(userId: number) {
+  return await prisma.reward.findMany({
+    where: { userId },
+    orderBy: { earnedAt: 'desc' },
+  })
+}
+
+export async function claimReward(userId: number, rewardId: number) {
+  const reward = await prisma.reward.findUnique({
+    where: { id: rewardId },
+  })
+
+  if (!reward || reward.userId !== userId) throw new Error('Reward not found')
+  if (reward.status !== 'PENDING') throw new Error('Reward not claimable')
+
+  const updated = await prisma.$transaction(async (tx) => {
+    const updatedReward = await tx.reward.update({
+      where: { id: rewardId },
+      data: { status: RewardStatus.CLAIMED },
+    })
+
+    await tx.balance.update({
       where: { userId },
-      data: { amount: { increment: cashbackPaise } },
-    }),
+      data: { amount: { increment: Number(reward.amount) } },
+    })
 
-    // 4) Optional: first recharge scratch reward
-    ...(isFirst
-      ? [
-          prisma.reward.create({
-            data: {
-              userId,
-              type: 'SCRATCH',
-              amount: 0, // placeholder
-              status: 'PENDING',
-              expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-              metadata: { name: 'Welcome Scratch' },
-            },
-          }),
-        ]
-      : []),
-  ]);
+    return updatedReward
+  })
+
+  return updated
 }

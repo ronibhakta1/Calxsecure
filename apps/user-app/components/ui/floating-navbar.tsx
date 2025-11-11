@@ -10,6 +10,7 @@ import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
 import { TextHoverEffect } from "../../../../packages/ui/src/text-hover-effect";
 import { useTheme } from "next-themes";
 import Link from "next/link";
+import { ModeToggle } from "./Modetoggle";
 
 export const FloatingNav = ({
   navItems,
@@ -62,6 +63,7 @@ export const FloatingNav = ({
             <span className="hidden sm:block text-sm">{navItem.name}</span>
           </Link>
         ))}
+        <ModeToggle />
 
         { status === "unauthenticated" && (
           <button className="border text-sm font-medium relative border-neutral-200 dark:border-white/[0.2] text-black dark:text-white px-4 py-2 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 transition"
@@ -88,6 +90,8 @@ export const FloatingNav = ({
           </DropdownMenu>
           
         )}
+
+
 
         
       </motion.div>
