@@ -46,12 +46,31 @@ model p2pTransfer {
   toUserId          Int?
   toUser            User?             @relation("ToUserRelation", fields: [toUserId], references: [id])
   receiverNumber    String?
-  status            String            @default("SUCCESS") // SUCCESS, REFUND_PENDING, REFUNDED
+  status            String            @default("PENDING") // SUCCESS, REFUND_PENDING, REFUNDED
   razorpayPaymentId String?           @unique
   wrongSendRequest  WrongSendRequest?
 
   // opposite relation for BillSplitPayment.p2pTransfer
   billSplitPayment  BillSplitPayment?
+  paymentMethod String    @default("UPI")
+  deviceInfo    Json?
+  ipAddress     String?
+  merchantId    Int?
+  latitude      Float?
+  longitude     Float?
+  isFraud       Boolean?  @default(false)
+  fraudScore    Float?    // 0 to 1
+  fraudReason   String?
+  riskLevel     String?   // LOW, MEDIUM, HIGH, CRITICAL
+}
+model FraudLog {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  transactionId Int?
+  score       Float
+  reason      String
+  blocked     Boolean
+  createdAt   DateTime @default(now())
 }
 model Merchant {
   id               Int               @id @default(autoincrement())

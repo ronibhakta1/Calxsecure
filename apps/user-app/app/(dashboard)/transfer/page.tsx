@@ -55,7 +55,7 @@ export default async function TransferPage() {
             <CardTitle className=" pl-4" id="onramp-title">
               On-Ramp Transactions
             </CardTitle>
-            <CardContent className="space-y-2 overflow-y-auto no-scrollbar max-h-[560px] mask-radial-fade-bottom">
+            <CardContent className="space-y-2 overflow-y-auto no-scrollbar h-[390px] mask-radial-fade-bottom">
               <OnRampList onRamps={onRamps} />
             </CardContent>
           </Card>

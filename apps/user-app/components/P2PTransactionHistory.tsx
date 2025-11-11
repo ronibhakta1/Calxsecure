@@ -15,7 +15,7 @@ export async function P2PTransactionHistory() {
   }
 
   return (
-    <div className="overflow-x-auto">
+    <div className="h-[390px] overflow-y-auto no-scrollbar">
       <table className="w-full text-sm">
         <thead>
           <tr className="border-b border-zinc-700 text-zinc-400">

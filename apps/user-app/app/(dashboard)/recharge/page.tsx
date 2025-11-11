@@ -39,6 +39,7 @@ export default async function RechargePage() {
       {!user.userpin ? (
         <div className="text-zinc-400">Please set your transaction PIN before proceeding.</div>
       ) : (
+        <div className="h-[440px] dark:bg-zinc-800 overflow-y-auto no-scrollbar">
         <RechargeForm
           user={{
             id: user.id,
@@ -46,6 +47,7 @@ export default async function RechargePage() {
             userpin: user.userpin,
           }}
         />
+        </div>
       )}
     </div>
   );

@@ -4,6 +4,7 @@ import crypto from "crypto";
 import db from "@repo/db/client";
 import prisma from "@repo/db/client";
 import axios from "axios";
+import { awardReward, randomScratchCard } from "./rewardEngine";
 
 const app = express();
 app.use(cors({ origin: ["http://localhost:3001"] }));
@@ -47,30 +48,61 @@ app.post("/hdfcWebhook", async (req, res) => {
       console.log("✅ Balance:", balanceResult.amount);
       console.log("✅ Transaction:", transactionResult.status);
     } else if (type === "BILL") {
-      const bill = await db.billSchedule.findUnique({
-        where: { token },
-      });
+      const bill = await db.billSchedule.findUnique({ where: { token } });
+      if (!bill) return res.status(404).json({ message: "Bill not found" });
 
-      if (!bill) {
-        return res.status(404).json({ message: "Bill not found" });
-      }
-
-      const billStatus = status === "SUCCESS" ? "PAID" : "OVERDUE";
       await db.billSchedule.update({
         where: { token },
-        data: { status: billStatus },
+        data: { status: status === "SUCCESS" ? "PAID" : "OVERDUE" },
       });
 
-      console.log("✅ Bill:", bill.id, billStatus);
+      if (status === "SUCCESS") {
+        const userId = bill.userId;
 
-      const notifyEndpoints = ["http://localhost:3001/api/bills/notify"];
+        // 2% cashback, max ₹100
+        const cashback = BigInt(
+          Math.min(Math.floor((bill.amount * 2) / 100), 10000)
+        );
+        if (cashback > 0) {
+          await awardReward(userId, "CASHBACK", cashback, {
+            source: "bill_payment",
+            billId: bill.id,
+          });
+        }
 
-      for (const endpoint of notifyEndpoints) {
-        await fetch(endpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ billId: bill.id, status: billStatus, token }),
+        // Every 3rd bill → scratch card
+        const paidBills = await db.billSchedule.count({
+          where: { userId, status: "PAID" },
         });
+        if (paidBills % 3 === 0) {
+          await awardReward(userId, "SCRATCH", randomScratchCard(), {
+            source: "bill_milestone",
+            count: paidBills,
+          });
+        }
+
+        // First bill ever → referral bonus
+        if (paidBills === 1) {
+          const referral = await db.referral.findFirst({
+            where: { referredUserId: userId },
+          });
+          if (referral) {
+            await awardReward(
+              referral.referrerId,
+              "REFERRAL",
+              10000n,
+              { source: "referral_bonus", referredUserId: userId },
+              "CLAIMED"
+            );
+            await awardReward(
+              userId,
+              "REFERRAL",
+              5000n,
+              { source: "welcome_bonus" },
+              "CLAIMED"
+            );
+          }
+        }
       }
     } else if (type === "P2P") {
       const transaction = await db.p2pTransfer.findUnique({
@@ -101,14 +133,15 @@ app.post("/hdfcWebhook", async (req, res) => {
       // Find the wrong-send request by the bank token stored on the wrongSendRequest record.
       // (Querying transaction.bankToken failed because p2pTransfer doesn't have that field.)
       const request = await db.wrongSendRequest.findFirst({
-        where: { txnId : Number(token) },
+        where: { txnId: Number(token) },
         include: {
           sender: { select: { id: true, name: true, number: true } },
           transaction: true,
         },
       });
 
-      if (!request) return res.status(404).json({ message: "Request not found" });
+      if (!request)
+        return res.status(404).json({ message: "Request not found" });
 
       // Safe access (use optional chaining). convert paise -> rupees for message.
       const amountRupees = Number(request.amount) / 100;
