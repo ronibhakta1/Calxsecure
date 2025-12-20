@@ -37,15 +37,14 @@ services:
         cp -n apps/merchant-app/.env.example apps/merchant-app/.env || true &&
         cp -n packages/db/.env.example packages/db/.env || true &&
 
-        echo '🔁 Updating DATABASE_URL inside packages/db/.env to use db:5432...' &&
-        sed -i 's/localhost:5431/db:5432/g' packages/db/.env &&
+        echo '🔁 Creating Docker-specific .env with db:5432...' &&
+        echo 'DATABASE_URL=postgresql://postgres:mysecretpassword@db:5432/postgres' > packages/db/.env.docker &&
 
         echo '🚀 Running Prisma migrate + generate...' &&
         cd packages/db &&
-        npx prisma migrate deploy --schema=prisma/schema.prisma &&
-        npx prisma generate --schema=prisma/schema.prisma &&
-        npx prisma db seed --schema=prisma/schema.prisma &&
-        npx prisma db seedreward --schema=prisma/schema.prisma &&
+        DATABASE_URL=postgresql://postgres:mysecretpassword@db:5432/postgres npx prisma migrate deploy --schema=prisma/schema.prisma &&
+        DATABASE_URL=postgresql://postgres:mysecretpassword@db:5432/postgres npx prisma generate --schema=prisma/schema.prisma &&
+        DATABASE_URL=postgresql://postgres:mysecretpassword@db:5432/postgres npx prisma db seed --schema=prisma/schema.prisma || true &&
 
 
         echo '✅ Prisma setup complete!'
