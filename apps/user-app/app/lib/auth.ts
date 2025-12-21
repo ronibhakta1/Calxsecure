@@ -74,7 +74,10 @@ export const authOptions: AuthOptions = {
         const user = await db.user.findUnique({
           where: { number: phone },
         });
-        if (!user) return null;
+        if (!user) {
+          console.log("[AUTH] User not found for phone:", phone);
+          return null;
+        }
 
         const ok = await bcrypt.compare(password, user.password);
         if (!ok) {
@@ -115,6 +118,7 @@ export const authOptions: AuthOptions = {
   callbacks: {
     async jwt({ token, user }: { token: JWT; user?: User }) {
       if (user) {
+          console.log("[AUTH-JWT] User object received:", { id: user.id, number: user.number });
         token.number = user.number;
         token.sessionToken = user.sessionToken;
       }
@@ -125,16 +129,19 @@ export const authOptions: AuthOptions = {
       const cachedToken = await redis.get(cacheKey);
 
       if (cachedToken && cachedToken !== token.sessionToken) {
+          console.error("[AUTH-JWT] Session expired - another device");
         throw new Error("SESSION_EXPIRED_ANOTHER_DEVICE");
       }
 
       if (!cachedToken) {
+          console.log("[AUTH-JWT] Cache miss - fetching from DB");
         const dbUser = await db.user.findUnique({
           where: { number: token.number },
           select: { sessionToken: true },
         });
 
         if (!dbUser) {
+                    console.error("[AUTH-JWT] User not found in DB");
           throw new Error("USER_NOT_FOUND");
         }
         // repopulate cache

@@ -66,8 +66,14 @@ async function getDashboardData(userId: number) {
   });
 
   const labels = Array.from({ length: 6 }, (_, i) => format(subDays(new Date(), 5 - i), "MMM dd"));
-  const sentData = labels.map(d => (sent.find(t => format(t.timestamp, "MMM dd") === d)?._sum?.amount || 0) / 100);
-  const receivedData = labels.map(d => (received.find(t => format(t.timestamp, "MMM dd") === d)?._sum?.amount || 0) / 100);
+  const sentData = labels.map((date) => {
+    const dayData = sent.find((t: typeof sent[number]) => format(t.timestamp, "MMM dd") === date);
+    return (Number(dayData?._sum?.amount || 0) / 100);
+  });
+  const receivedData = labels.map((date) => {
+    const dayData = received.find((t: typeof received[number]) => format(t.timestamp, "MMM dd") === date);
+    return (Number(dayData?._sum?.amount || 0) / 100);
+  });
 
   return {
     balance: { amount: balance?.amount || 0, locked: balance?.locked || 0 },
