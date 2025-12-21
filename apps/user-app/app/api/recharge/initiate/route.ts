@@ -1,7 +1,7 @@
 
 import { NextResponse } from "next/server";
 import db from "@repo/db/client";
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/lib/auth";
 import { triggerRechargeRewards } from "@/app/lib/rewardEngine";
 

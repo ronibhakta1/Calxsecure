@@ -19,7 +19,7 @@ interface WrongSendRequest {
 
 type Stage = 'info' | 'pin' | 'success';
 
-export default function ReturnPage({ params }: { params: { id: string } }) {
+export default function ReturnPage(props: any) {
   const [request, setRequest] = useState<WrongSendRequest | null>(null);
   const [timeLeft, setTimeLeft] = useState(0);
   const [showPin, setShowPin] = useState(false);
@@ -28,12 +28,29 @@ export default function ReturnPage({ params }: { params: { id: string } }) {
   const [loading, setLoading] = useState(false);
   const [stage, setStage] = useState<Stage>('info');
   const pinInputRef = useRef<HTMLInputElement>(null);
+  const [routeParams, setRouteParams] = useState<{ id: string } | null>(null);
+
+  // Resolve Next.js async params (Next 15) or plain object
+  useEffect(() => {
+    const p = (props as any)?.params;
+    if (!p) {
+      setRouteParams(null);
+      return;
+    }
+    if (typeof p.then === 'function') {
+      (p as Promise<{ id: string }>).then(setRouteParams).catch(() => setRouteParams(null));
+    } else {
+      setRouteParams(p as { id: string });
+    }
+  }, [props]);
 
   // Fetch request data
   useEffect(() => {
     const fetchRequest = async () => {
       try {
-        const res = await axios.get(`/api/wrong-send/${params.id}`);
+        const id = routeParams?.id;
+        if (!id) return;
+        const res = await axios.get(`/api/wrong-send/${id}`);
         const data = res.data;
         setRequest(data);
         const diff = new Date(data.expiresAt).getTime() - Date.now();
@@ -43,7 +60,7 @@ export default function ReturnPage({ params }: { params: { id: string } }) {
       }
     };
     fetchRequest();
-  }, [params.id]);
+  }, [routeParams?.id]);
 
   // Timer countdown
   useEffect(() => {
@@ -84,7 +101,7 @@ export default function ReturnPage({ params }: { params: { id: string } }) {
     setLoading(true);
     try {
       await axios.post('/api/wrong-send/approve', {
-        requestId: params.id,
+        requestId: routeParams?.id,
         pin,
       });
       confetti({
@@ -102,7 +119,7 @@ export default function ReturnPage({ params }: { params: { id: string } }) {
     } finally {
       setLoading(false);
     }
-  }, [pin, params.id]);
+  }, [pin, routeParams?.id]);
 
   if (!request) {
     return (

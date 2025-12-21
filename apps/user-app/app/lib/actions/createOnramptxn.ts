@@ -1,7 +1,7 @@
 "use server";
 import prisma from "@repo/db/client";
 import { authOptions } from "../auth";
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import Razorpay from "razorpay";
 
 

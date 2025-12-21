@@ -1,6 +1,6 @@
 
 import db from "@repo/db/client";
-import { RewardStatus } from "@prisma/client";
+import { RewardStatus } from "../../../../packages/generated";
 
 export async function getRewardsForUser(userId: number) {
   const rewards = await db.reward.findMany({

@@ -1,10 +1,7 @@
 
-import { PrismaClient } from "@prisma/client";
 import { NextResponse } from "next/server";
-
+import prisma from "@repo/db/client";
 import { v4 as uuidv4 } from "uuid";
-
-const prismaClient = new PrismaClient();
 
 async function processBankPayment(billData: any) {
   try {
@@ -61,14 +58,14 @@ export async function POST(request: Request) {
     }
 
     // Validate user
-    const user = await prismaClient.user.findUnique({ where: { id: Number(userId) } });
+    const user = await prisma.user.findUnique({ where: { id: Number(userId) } });
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
     // Optional merchant
     if (merchantId) {
-      const merchant = await prismaClient.merchant.findUnique({ where: { id: Number(merchantId) } });
+      const merchant = await prisma.merchant.findUnique({ where: { id: Number(merchantId) } });
       if (!merchant) {
         return NextResponse.json({ error: "Merchant not found" }, { status: 404 });
       }
@@ -85,7 +82,7 @@ export async function POST(request: Request) {
       : null;
 
     // Create bill
-    const bill = await prismaClient.billSchedule.create({
+    const bill = await prisma.billSchedule.create({
       data: {
         userId: Number(userId),
         merchantId: merchantId ? Number(merchantId) : null,
@@ -108,7 +105,7 @@ export async function POST(request: Request) {
         amount: amountInPaise,
       });
 
-      await prismaClient.billSchedule.update({
+      await prisma.billSchedule.update({
         where: { id: bill.id },
         data: { token: paymentResult.token },
       });
@@ -138,7 +135,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Missing userId" }, { status: 400 });
     }
 
-    const bills = await prismaClient.billSchedule.findMany({
+    const bills = await prisma.billSchedule.findMany({
       where: { userId: Number(userId) },
       orderBy: { dueDate: "asc" },
     });

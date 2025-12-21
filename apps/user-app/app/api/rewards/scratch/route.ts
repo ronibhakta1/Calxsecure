@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import prisma from '@repo/db/client';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/lib/auth';
 
 const SCRATCH_AMOUNTS = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50];

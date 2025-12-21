@@ -7,6 +7,8 @@ import { ThemeProvider } from "../components/ui/theme-provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "CalxSecure",
   description: "payment app",

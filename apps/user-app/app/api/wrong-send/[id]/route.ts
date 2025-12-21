@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import prisma from '@repo/db/client';
 
-export async function GET(_: Request, { params }: { params: { id: string } }) {
+export async function GET(_: Request, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
   const request = await prisma.wrongSendRequest.findUnique({
-    where: { id: Number(params.id) },
+    where: { id: Number(id) },
     include: {
       sender: { select: { name: true } },
       transaction: { select: { amount: true } },

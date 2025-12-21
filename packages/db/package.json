@@ -2,19 +2,22 @@
   "name": "@repo/db",
   "version": "0.0.0",
   "dependencies": {
-    "@prisma/client": "^6.18.0",
-    "tsx": "^4.20.6"
+    "@prisma/adapter-pg": "^7.2.0",
+    "@prisma/client": "^7.2.0",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.4.5",
+    "pg": "^8.13.1",
+    "tsx": "^4.20.6",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
-    "prisma": "^6.19.0",
+    "@types/pg": "^8.16.0",
+    "prisma": "^7.2.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
   },
   "exports": {
     "./client": "./index.ts"
-  },
-  "prisma": {
-    "seed": "tsx prisma/seed.ts"
   },
   "scripts": {
     "db:generate": "prisma generate",

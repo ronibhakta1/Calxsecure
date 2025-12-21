@@ -1,5 +1,5 @@
 
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
 import { authOptions } from "../lib/auth";
 import prisma from "@repo/db/client";

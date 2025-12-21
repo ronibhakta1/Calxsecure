@@ -1,13 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import prisma from "@repo/db/client";
 import { authOptions } from "@/app/lib/auth";
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
   const session = await getServerSession(authOptions);
   if (!session?.user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { transferId } = await req.json();
-  const groupId = parseInt(params.id, 10);
+  const groupId = parseInt(id, 10);
   const userId = parseInt(session.user.id as string, 10);
 
   const transfer = await prisma.p2pTransfer.findUnique({

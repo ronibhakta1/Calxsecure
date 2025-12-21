@@ -7,7 +7,18 @@ import { Button } from '@/components/ui/button'
 import { Gift, Users, Percent, Milestone, Sparkles } from 'lucide-react'
 import { ScratchCard } from './ScratchCard'
 import { motion } from 'framer-motion'
-import { Reward } from '@prisma/client'
+
+type Reward = {
+  id: number
+  userId: number
+  type: 'CASHBACK' | 'SCRATCH' | 'REFERRAL' | 'MILESTONE'
+  amount: bigint
+  status: 'PENDING' | 'CLAIMED' | 'EXPIRED'
+  earnedAt: Date
+  expiresAt: Date | null
+  metadata?: any
+  billSplitGroupId?: number | null
+}
 
 interface RewardCardProps {
   reward: Reward

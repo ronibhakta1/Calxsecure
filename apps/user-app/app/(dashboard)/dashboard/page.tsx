@@ -1,5 +1,5 @@
 
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import prisma from "@repo/db/client";
 import { BalanceCard } from "@/components/BalanceCard";
 import { StatsCards } from "@/components/StatsCards";
@@ -8,7 +8,7 @@ import { Toaster } from "react-hot-toast";
 import { authOptions } from "@/app/lib/auth";
 import { startOfDay, subDays, format } from "date-fns";
 import ReturnPendingList from "@/components/ReturnPendingList";
-import { P2PTransactionHistory } from "@/components/P2PTransactionHistory"; // NEW
+import { P2PTransactionHistory } from "@/components/P2PTransactionHistory"; 
 import { Avatar, AvatarFallback, AvatarImage } from "../../../../../packages/ui/src/avatar";
 
 async function getDashboardData(userId: number) {
