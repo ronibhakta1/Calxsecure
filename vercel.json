@@ -1,0 +1,13 @@
+{
+  "buildCommand": "cd ../.. && turbo run build --filter={apps/user-app}...",
+  "outputDirectory": "apps/user-app/.next",
+  "env": {
+    "DATABASE_URL": "@database_url",
+    "NEXTAUTH_SECRET": "@nextauth_secret",
+    "NEXTAUTH_URL": "@nextauth_url",
+    "RAZORPAY_KEY_ID": "@razorpay_key_id",
+    "RAZORPAY_KEY_SECRET": "@razorpay_key_secret",
+    "REDIS_URL": "@redis_url",
+    "NODE_ENV": "production"
+  }
+}
