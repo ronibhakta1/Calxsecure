@@ -1,6 +1,14 @@
-import { PrismaClient } from '@prisma/client';
+import 'dotenv/config'
+import { PrismaClient } from '../../generated';
+import { Pool } from 'pg'
+import { PrismaPg } from '@prisma/adapter-pg'
 
-const prisma = new PrismaClient();
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL is not set')
+}
+const pool = new Pool({ connectionString: process.env.DATABASE_URL })
+const adapter = new PrismaPg(pool)
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   const users = await prisma.user.findMany({ take: 2 });

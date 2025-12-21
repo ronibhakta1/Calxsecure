@@ -1,0 +1,328 @@
+generator client {
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x", "windows"]
+  output   = "../generated"
+
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+model User {
+  id                Int                 @id @default(autoincrement())
+  email             String?             @unique
+  name              String?
+  number            String              @unique
+  password          String
+  sessionToken      String?
+  image             String?
+  userpin           String
+  resetOtp          String?
+  resetExpires      DateTime?
+  OnRampTransaction OnRampTransaction[]
+  Balance           Balance[]
+  sentTransfers     p2pTransfer[]       @relation(name: "FromUserRelation")
+  receivedTransfers p2pTransfer[]       @relation(name: "ToUserRelation")
+  sentRequests      P2PRequest[]        @relation("P2PRequestSender")
+  receivedRequests  P2PRequest[]       @relation("P2PRequestReceiver")
+  billSchedules     BillSchedule[]
+  merchantPayments  MerchantPayment[]   @relation("UserMerchantPayments")
+  rechargeOrders    RechargeOrder[]     
+  rewards           Reward[]
+  referralsAsReferrer  Referral[]       @relation("Referrer")
+  referralsAsReferred Referral[]        @relation("Referred")
+  wrongSendRequests   WrongSendRequest[] @relation("UserWrongSendRequests")
+
+  // added opposite relation fields
+  createdGroups     BillSplitGroup[]    @relation("CreatedGroups")
+  billSplitMembers  BillSplitMember[]
+}
+
+model p2pTransfer {
+  id                Int               @id @default(autoincrement())
+  amount            Int
+  timestamp         DateTime
+  fromUserId        Int
+  fromUser          User              @relation("FromUserRelation", fields: [fromUserId], references: [id])
+  toUserId          Int?
+  toUser            User?             @relation("ToUserRelation", fields: [toUserId], references: [id])
+  receiverNumber    String?
+  status            String            @default("PENDING") // SUCCESS, REFUND_PENDING, REFUNDED
+  razorpayPaymentId String?           @unique
+  wrongSendRequest  WrongSendRequest?
+
+  // opposite relation for BillSplitPayment.p2pTransfer
+  billSplitPayment  BillSplitPayment?
+  paymentMethod String    @default("UPI")
+  deviceInfo    Json?
+  ipAddress     String?
+  merchantId    Int?
+  latitude      Float?
+  longitude     Float?
+  isFraud       Boolean?  @default(false)
+  fraudScore    Float?    // 0 to 1
+  fraudReason   String?
+  riskLevel     String?   // LOW, MEDIUM, HIGH, CRITICAL
+}
+model FraudLog {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  transactionId Int?
+  score       Float
+  reason      String
+  blocked     Boolean
+  createdAt   DateTime @default(now())
+}
+model Merchant {
+  id               Int               @id @default(autoincrement())
+  email            String            @unique
+  name             String?
+  upiId            String?           @unique // Add UPI ID for payments
+  auth_type        AuthType
+  billSchedules    BillSchedule[]
+  payments         MerchantPayment[] @relation("MerchantPayments")
+}
+
+model MerchantPayment {
+  id           Int      @id @default(autoincrement())
+  merchantId   Int
+  merchant     Merchant @relation("MerchantPayments", fields: [merchantId], references: [id])
+  qrId         String   @unique
+  amount       Int      // In paise
+  status       String   // PENDING, SUCCESS, FAILED
+  userId       Int?     // Optional, links to User who paid
+  user         User?    @relation("UserMerchantPayments", fields: [userId], references: [id])
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  transactionId String?  @unique // UPI transaction ID
+}
+
+model OnRampTransaction {
+  id            Int          @id @default(autoincrement())
+  status        OnRampStatus
+  token         String       @unique
+  provider      String
+  amount        Int
+  startTime     DateTime     @default(now())
+  transactionId String?      @unique // Bank transaction ID
+  userId        Int
+  user          User         @relation(fields: [userId], references: [id])
+  @@index([userId, startTime]) 
+}
+
+model P2PRequest {
+  id           Int      @id @default(autoincrement())
+  senderId     Int
+  sender       User     @relation("P2PRequestSender", fields: [senderId], references: [id])
+  receiverId   Int?
+  receiver     User?    @relation("P2PRequestReceiver", fields: [receiverId], references: [id])
+  receiverNumber String
+  amount       Int      
+  message      String?
+  status       P2PRequestStatus @default(PENDING)
+  createdAt    DateTime @default(now())
+  settledAt    DateTime?
+
+  // opposite relation for BillSplitMember.request
+  billSplitMemberId Int? @unique
+  billSplitMember   BillSplitMember? @relation(fields: [billSplitMemberId], references: [id])
+  
+  @@map("p2p_requests")
+}
+
+model BillSchedule {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  merchantId  Int?
+  merchant    Merchant? @relation(fields: [merchantId], references: [id])
+  billType    String   // 🚨 FIXED: String (not enum)
+  provider    String
+  accountNo   String
+  amount      Int      // 🚨 FIXED: Int (not Float)
+  dueDate     DateTime
+  nextPayment DateTime?
+  createdAt   DateTime @default(now())
+  paymentMethod String @default("UPI")
+  status      String @default("PENDING")
+  token       String?   @unique
+
+  
+  @@map("bill_schedules")
+}
+
+model RechargePlan{
+  id         Int      @id @default(autoincrement())
+  operator    String
+  circle      String
+  planCode    String  
+  amount      Int
+  planType    String
+  validity    String?
+  data        String?
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  rechargeOrders RechargeOrder[]
+  @@map("recharge_plans")
+}
+model RechargeOrder{
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  planId      Int?
+  plan        RechargePlan? @relation(fields: [planId], references: [id])
+  mobileNumber String
+  operator     String
+  circle       String
+  amount       Int
+  status       String  @default("PENDING") // PENDING, SUCCESS, FAILED
+  providerTxnId String?  // Transaction ID from operator
+  orderId      String   @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  @@map("recharge_orders")
+}
+
+model Reward {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  type         RewardType
+  amount       BigInt   // paise
+  status       RewardStatus @default(PENDING)
+  earnedAt     DateTime @default(now())
+  expiresAt    DateTime?
+  metadata     Json?
+  user         User     @relation(fields: [userId], references: [id])
+
+  // opposite relation for BillSplitGroup.rewards
+  billSplitGroupId Int?
+  billSplitGroup   BillSplitGroup? @relation(fields: [billSplitGroupId], references: [id])
+
+  @@index([userId])
+  @@index([type])
+}
+
+model Referral {
+  id             Int   @id @default(autoincrement())
+  referrerId     Int
+  referredUserId Int?
+  referralCode   String @unique
+  referrer       User  @relation("Referrer", fields: [referrerId], references: [id])
+  referred       User? @relation("Referred", fields: [referredUserId], references: [id])
+
+  @@index([referralCode])
+}
+model WrongSendRequest {
+  id               Int      @id @default(autoincrement())
+  txnId            Int      @unique
+  senderId         Int
+  receiverNumber   String
+  amount           BigInt
+  status           WrongSendStatus @default(PENDING)
+  expiresAt        DateTime
+  penaltyPaid      Boolean  @default(false)
+  razorpayRefundId String?  @unique
+  createdAt        DateTime @default(now())
+  sender           User     @relation("UserWrongSendRequests", fields: [senderId], references: [id])
+  transaction      p2pTransfer @relation(fields: [txnId], references: [id])
+
+  @@index([status])
+}
+
+model BillSplitGroup {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  totalAmount Int      // in paise
+  currency    String   @default("INR")
+  createdById Int
+  createdBy   User     @relation("CreatedGroups", fields: [createdById], references: [id])
+  createdAt   DateTime @default(now())
+  settledAt   DateTime?
+  status      String   @default("PENDING") // PENDING, SETTLED, CANCELLED
+  members     BillSplitMember[]
+  payments    BillSplitPayment[]
+  rewards     Reward[] // bonus when fully settled
+}
+
+model BillSplitMember {
+  id         Int             @id @default(autoincrement())
+  groupId    Int
+  group      BillSplitGroup  @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  userId     Int?
+  user       User?           @relation(fields: [userId], references: [id])
+  phone      String?         // fallback if not registered
+  name       String
+  share      Int             // in paise
+  paid       Boolean         @default(false)
+  paidAt     DateTime?
+  paidAmount Int             @default(0)
+  request    P2PRequest?     // auto-created request
+
+  // opposite relation for BillSplitPayment.member
+  payments   BillSplitPayment[]
+}
+model BillSplitPayment {
+  id         Int            @id @default(autoincrement())
+  groupId    Int
+  group      BillSplitGroup @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  memberId   Int
+  member     BillSplitMember @relation(fields: [memberId], references: [id])
+  p2pTransferId Int? @unique
+  p2pTransfer   p2pTransfer?  @relation(fields: [p2pTransferId], references: [id])
+  amount     Int
+  paidAt     DateTime       @default(now())
+}
+enum WrongSendStatus {
+  PENDING
+  RETURNED
+  EXPIRED
+}
+enum BillType {
+  ELECTRICITY
+  WATER
+  GAS
+  PHONE_RECHARGE
+  DTH
+}
+enum RewardType {
+  CASHBACK
+  SCRATCH
+  REFERRAL
+  MILESTONE
+}
+
+enum RewardStatus {
+  PENDING
+  CLAIMED
+  EXPIRED
+}
+
+enum P2PRequestStatus {
+  PENDING
+  SETTLED
+  EXPIRED
+  CANCELLED
+}
+model Balance {
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique
+  amount Int
+  locked Int
+  user   User @relation(fields: [userId], references: [id])
+}
+
+enum AuthType {
+  Google
+  Github
+}
+
+enum OnRampStatus {
+  Success
+  Failure
+  Processing
+}

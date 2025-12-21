@@ -1,8 +1,16 @@
-import { PrismaClient, AuthType } from '@prisma/client';
-import bcrypt from "bcrypt";
+import 'dotenv/config'
+import { PrismaClient } from '../../generated';
+import { Pool } from 'pg'
+import { PrismaPg } from '@prisma/adapter-pg'
+import bcrypt from "bcryptjs";
 import { v4 as uuid } from "uuid";
 
-const prisma = new PrismaClient();
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL is not set')
+}
+const pool = new Pool({ connectionString: process.env.DATABASE_URL })
+const adapter = new PrismaPg(pool)
+const prisma = new PrismaClient({ adapter });
 
 /* -------------------------------------------------------------------------- */
 /*  1. ALL 23 CIRCLES (official TRAI list – Nov 2025)                        */
@@ -91,13 +99,13 @@ async function main() {
 
   /* ---------- MERCHANTS ---------- */
   const merchantsData = [
-    { email: "bses@merchant.com", name: "BSES Rajdhani Power Ltd", upiId: "upi-bses-rajdhani", auth_type: AuthType.Google },
-    { email: "delhijal@merchant.com", name: "Delhi Jal Board", upiId: "upi-delhi-jal", auth_type: AuthType.Github },
-    { email: "indane@merchant.com", name: "Indane Gas", upiId: "upi-indane-gas", auth_type: AuthType.Google },
-    { email: "airtel@merchant.com", name: "Airtel Payments", upiId: "upi-airtel-payments", auth_type: AuthType.Google },
-    { email: "tatasky@merchant.com", name: "Tata Sky DTH", upiId: "upi-tata-sky", auth_type: AuthType.Github },
-    { email: "tpddl@merchant.com", name: "TPDDL Electricity", upiId: "upi-tpddl-electricity", auth_type: AuthType.Google },
-    { email: "jio@merchant.com", name: "Jio Recharge", upiId: "upi-jio-recharge", auth_type: AuthType.Github },
+    { email: "bses@merchant.com", name: "BSES Rajdhani Power Ltd", upiId: "upi-bses-rajdhani", auth_type: "Google" },
+    { email: "delhijal@merchant.com", name: "Delhi Jal Board", upiId: "upi-delhi-jal", auth_type: "Github" },
+    { email: "indane@merchant.com", name: "Indane Gas", upiId: "upi-indane-gas", auth_type: "Google" },
+    { email: "airtel@merchant.com", name: "Airtel Payments", upiId: "upi-airtel-payments", auth_type: "Google" },
+    { email: "tatasky@merchant.com", name: "Tata Sky DTH", upiId: "upi-tata-sky", auth_type: "Github" },
+    { email: "tpddl@merchant.com", name: "TPDDL Electricity", upiId: "upi-tpddl-electricity", auth_type: "Google" },
+    { email: "jio@merchant.com", name: "Jio Recharge", upiId: "upi-jio-recharge", auth_type: "Github" },
   ];
   await prisma.merchant.createMany({ data: merchantsData, skipDuplicates: true });
   const merchantList = await prisma.merchant.findMany();

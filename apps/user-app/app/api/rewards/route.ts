@@ -2,7 +2,7 @@
 import { authOptions } from "@/app/lib/auth";
 import { getRewardsForUser } from "@/app/lib/rewards";
 import { seedRewardsIfEmpty } from "@/app/lib/seedrewards";
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import { NextResponse } from "next/server";
 
 export async function GET() {

@@ -2,6 +2,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/app/lib/auth";
 import { SplitCard } from "@/components/SplitCard";
 
+export const dynamic = "force-dynamic";
+
 export default async function SplitPage() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) {

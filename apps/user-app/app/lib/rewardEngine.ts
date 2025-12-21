@@ -1,13 +1,13 @@
 // lib/rewardEngine.ts
 import prisma from "@repo/db/client";
-import { RewardType } from "@prisma/client";
+type RewardTypeLiteral = "CASHBACK" | "SCRATCH" | "MILESTONE";
 
 /**
  * Awards a reward to a user
  */
 export async function awardReward(
   userId: number,
-  type: RewardType,
+  type: RewardTypeLiteral,
   amount: bigint,
   metadata?: Record<string, any>,
   status: "PENDING" | "CLAIMED" = "PENDING"
@@ -46,8 +46,6 @@ export async function triggerRechargeRewards(
   rechargeAmount: number, // in rupees
   isFirstRecharge: boolean = false
 ) {
-  const amountPaise = BigInt(rechargeAmount * 100);
-
   // 2% cashback, max ₹50
   const cashback = BigInt(Math.min(Math.floor((rechargeAmount * 2) / 100), 50) * 100);
   if (cashback > 0) {

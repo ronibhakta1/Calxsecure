@@ -1,7 +1,6 @@
 
-
-import { RewardStatus } from '@prisma/client'
 import prisma from '@repo/db/client'
+type RewardStatus = 'PENDING' | 'CLAIMED' | 'EXPIRED'
 
 export async function getRewardsForUser(userId: number) {
   return await prisma.reward.findMany({
@@ -21,7 +20,7 @@ export async function claimReward(userId: number, rewardId: number) {
   const updated = await prisma.$transaction(async (tx) => {
     const updatedReward = await tx.reward.update({
       where: { id: rewardId },
-      data: { status: RewardStatus.CLAIMED },
+      data: { status: 'CLAIMED' },
     })
 
     await tx.balance.update({

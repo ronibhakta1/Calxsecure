@@ -1,4 +1,4 @@
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import prisma from "@repo/db/client";
 import { authOptions } from "@/app/lib/auth";
 import { AddMoney } from "@/components/AddMoneyCard";

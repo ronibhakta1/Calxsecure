@@ -2,7 +2,7 @@
 "use server";
 
 import prisma from "@repo/db/client";
-import { getServerSession } from "next-auth";
+import { getServerSession } from "next-auth/next";
 import { authOptions } from "../auth";
 import { awardReward, randomScratchCard } from "../rewardEngine";
 import { PythonShell } from "python-shell";
