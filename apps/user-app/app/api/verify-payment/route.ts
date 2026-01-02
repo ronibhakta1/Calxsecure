@@ -1,41 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
-import Razorpay from "razorpay";
 import crypto from "crypto";
 import prisma from "@repo/db/client";
-
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID!,
-  key_secret: process.env.RAZORPAY_KEY_SECRET!,
-});
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = body;
+    const { order_id, payment_id, signature } = body;
 
-    if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
+    if (!order_id || !payment_id || !signature) {
       return NextResponse.json(
         { success: false, message: "Missing parameters" },
         { status: 400 }
       );
     }
 
-    // 1️⃣ Verify signature
+    // Simple signature verification (replace with your payment provider logic)
     const expectedSignature = crypto
-      .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET!)
-      .update(`${razorpay_order_id}|${razorpay_payment_id}`)
+      .createHmac("sha256", "test-secret")
+      .update(`${order_id}|${payment_id}`)
       .digest("hex");
 
-    if (expectedSignature !== razorpay_signature) {
+    if (expectedSignature !== signature) {
       return NextResponse.json(
         { success: false, message: "Invalid signature" },
         { status: 400 }
       );
     }
 
-    // 2️⃣ Find transaction by razorpay_order_id (not token)
+    // Find transaction by order_id
     const transaction = await prisma.onRampTransaction.findUnique({
-      where: { transactionId: razorpay_order_id }, // store Razorpay order ID when creating order
+      where: { transactionId: order_id },
     });
 
     if (!transaction) {
@@ -45,7 +39,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 3️⃣ Update transaction status
+    //  Update transaction status
     await prisma.onRampTransaction.update({
       where: { id: transaction.id },
       data: {
@@ -53,7 +47,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // 4️⃣ Update user balance
+    // Update user balance
     await prisma.balance.upsert({
       where: { userId: transaction.userId },
       update: {
@@ -71,7 +65,7 @@ export async function POST(req: NextRequest) {
       message: "Payment verified and balance updated",
     });
   } catch (err: any) {
-    console.error("Razorpay verification failed:", err);
+    console.error("Payment verification failed:", err);
     return NextResponse.json(
       { success: false, message: err.message || "Server error" },
       { status: 500 }

@@ -103,18 +103,16 @@ const Page = () => {
               CalxSecure empowers you to handle every transaction with total
               trust.
             </p>
-            <HoverBorderGradient>
-              {status === "authenticated" && (
-                <button onClick={() => router.push("/dashboard")}>
-                  Go to Dashboard
-                </button>
-              )}
-              {status === "unauthenticated" && (
-                <button onClick={() => router.push("/auth/signup")}>
-                  Get Started
-                </button>
-              )}
-            </HoverBorderGradient>
+            {status === "authenticated" && (
+              <HoverBorderGradient onClick={() => router.push("/dashboard")}>
+                Go to Dashboard
+              </HoverBorderGradient>
+            )}
+            {status === "unauthenticated" && (
+              <HoverBorderGradient onClick={() => router.push("/auth/signup")}>
+                Get Started
+              </HoverBorderGradient>
+            )}
           </div>
         </div>
       </BackgroundBeamsWithCollision>
@@ -193,18 +191,16 @@ const Page = () => {
             Join thousands of users and merchants powering their payments with
             CalxSecure
           </p>
-          <HoverBorderGradient>
-            {status === "authenticated" && (
-              <button onClick={() => router.push("/dashboard")}>
-                Go to Dashboard
-              </button>
-            )}
-            {status === "unauthenticated" && (
-              <button onClick={() => router.push("/auth/signup")}>
-                Get Started
-              </button>
-            )}
-          </HoverBorderGradient>
+          {status === "authenticated" && (
+            <HoverBorderGradient onClick={() => router.push("/dashboard")}>
+              Go to Dashboard
+            </HoverBorderGradient>
+          )}
+          {status === "unauthenticated" && (
+            <HoverBorderGradient onClick={() => router.push("/auth/signup")}>
+              Get Started
+            </HoverBorderGradient>
+          )}
         </div>
       </section>
 

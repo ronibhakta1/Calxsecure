@@ -22,7 +22,7 @@ export async function GET(request: Request) {
     orderBy: { amount: "asc" },
   });
 
-  // Simulate real API delay
+  // Simulate latency for testing
   await new Promise((r) => setTimeout(r, 500));
 
   return NextResponse.json({ plans });

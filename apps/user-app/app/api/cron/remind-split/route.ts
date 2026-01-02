@@ -7,7 +7,7 @@ export async function GET() {
 
   for (const m of pending) {
     if (m.userId) {
-      // Send SMS or push via Firebase / OneSignal
+      // Send SMS or notification
       console.log(`Reminder: ${m.name} owes ₹${m.share / 100} for ${m.group.name}`);
     }
   }

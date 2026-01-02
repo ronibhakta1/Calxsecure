@@ -1,4 +1,4 @@
-// app/api/fraud/check/route.ts
+
 import { NextResponse } from "next/server";
 import prisma from "@repo/db/client";
 import axios from "axios";

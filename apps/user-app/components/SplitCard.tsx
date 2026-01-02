@@ -19,7 +19,7 @@ export function SplitCard() {
       validFriends, 
       Number(totalAmount) * 100 / validFriends.length
     );
-    alert("✅ Split requests sent!");
+    alert("Split requests sent!");
     setLoading(false);
   };
 

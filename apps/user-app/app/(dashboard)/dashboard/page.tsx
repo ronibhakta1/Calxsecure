@@ -91,7 +91,7 @@ export default async function DashboardPage() {
   }
 
   const userId = Number(session.user.id);
-  const { balance, transfers, onRamps, pendingReturns, chartData } = await getDashboardData(userId);
+  const { balance, transfers, onRamps, pendingReturns,  } = await getDashboardData(userId);
 
   return (
     <DashboardClient transfers={transfers}>
