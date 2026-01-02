@@ -11,7 +11,7 @@ export const revalidate = 0;
 
 export const metadata: Metadata = {
   title: "CalxSecure",
-  description: "payment app",
+  description: "Secure and Seamless Payments Platform",
   keywords: ["payments", "security", "fintech"],
   icons: {
     icon: "/favicon.ico",

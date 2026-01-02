@@ -60,7 +60,7 @@ export function BillPaymentCard({ userId, schedules }: { userId: number; schedul
 
       const data = await response.json();
       if (response.ok) {
-        setMessage("✅ Bill scheduled successfully!");
+        setMessage("Bill scheduled successfully!");
         setProvider("");
         setAccountNo("");
         setAmount("");
@@ -71,11 +71,11 @@ export function BillPaymentCard({ userId, schedules }: { userId: number; schedul
         setTimeout(() => window.location.reload(), 1500);
       } else {
         console.error("API error:", data);
-        setMessage(`❌ Failed to schedule bill: ${data.error || "Unknown error"}`);
+        setMessage(`Failed to schedule bill: ${data.error || "Unknown error"}`);
       }
     } catch (error) {
       console.error("Network error:", error);
-      setMessage("❌ Network error!");
+      setMessage("Network error!");
     } finally {
       setIsLoading(false);
     }

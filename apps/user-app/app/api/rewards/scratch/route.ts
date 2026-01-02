@@ -3,7 +3,7 @@ import prisma from '@repo/db/client';
 import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/lib/auth';
 
-const SCRATCH_AMOUNTS = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50];
+const SCRATCH_AMOUNTS = [1, 2, 3, 4, 5, 6, 7,8, 9, 10];
 
 export async function POST() {
   const session = await getServerSession(authOptions);

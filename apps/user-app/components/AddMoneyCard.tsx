@@ -396,7 +396,6 @@ const PinDialog: React.FC<PinDialogProps> = ({
   setPin,
   userpin,
   handlePinConfirm,
-  setAmountError,
   isFormValid,
 }) => {
   const [showPin, setShowPin] = useState(false);
@@ -425,15 +424,13 @@ const PinDialog: React.FC<PinDialogProps> = ({
       <DialogTrigger
         asChild
         className="flex w-full items-center"
-        disabled={!isFormValid}
       >
-        <HoverBorderGradient>
-          <button className=" disabled:bg-zinc-600/50 disabled:cursor-not-allowed">
-            Add via {paymentMethod.label}
-          </button>
-
+        <HoverBorderGradient
+          as="button"
+          className={`${!isFormValid ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
+        >
+          Add via {paymentMethod.label}
         </HoverBorderGradient>
-        
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>

@@ -1,4 +1,3 @@
-// components/SendCard.tsx
 "use client";
 
 import { p2pTransfer } from "@/app/lib/actions/p2pTransfer";

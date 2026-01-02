@@ -19,6 +19,7 @@ function createRedis(): IORedisClient {
   // Suppress all Redis errors during build/runtime
   redis.on("error", () => {
     // Silently handle errors
+    console.log("[REDIS] Connection error occurred");
   });
 
   return redis;

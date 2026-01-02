@@ -1,6 +1,5 @@
 import { getP2PTransactions } from "@/app/lib/actions/getP2PTransactions";
-import { Button } from "@/components/ui/button";
-import { AlertTriangle, Clock } from "lucide-react";
+
 
 export async function P2PTransactionHistory() {
   const transactions = await getP2PTransactions();

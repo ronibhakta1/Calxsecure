@@ -4,8 +4,8 @@ import { getServerSession } from 'next-auth/next';
 import { authOptions } from '@/app/lib/auth';
 
 const REDEEM_OPTIONS = [
-  { id: 'amazon100', name: '₹100 Amazon', points: 10000, cashback: 10000 },
-  { id: 'flipkart50', name: '₹50 Flipkart', points: 5000, cashback: 5000 },
+  { id: 'amazon100', name: '₹10 Amazon', points: 1000, cashback: 10000 },
+  { id: 'flipkart50', name: '₹8 Flipkart', points: 800, cashback: 8000 },
 ];
 
 export async function POST(req: Request) {

@@ -1,7 +1,7 @@
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import crypto from "crypto";
-import db from "@repo/db/client";
 import prisma from "@repo/db/client";
 import axios from "axios";
 import { awardReward, randomScratchCard } from "./rewardEngine";
@@ -15,7 +15,7 @@ app.post("/hdfcWebhook", async (req, res) => {
 
   try {
     if (type === "ONRAMP") {
-      const transaction = await db.onRampTransaction.findUnique({
+      const transaction = await prisma.onRampTransaction.findUnique({
         where: { token },
       });
 
@@ -29,8 +29,8 @@ app.post("/hdfcWebhook", async (req, res) => {
         amount: Number(amount),
       };
 
-      const [balanceResult, transactionResult] = await db.$transaction([
-        db.balance.upsert({
+      const [balanceResult, transactionResult] = await prisma.$transaction([
+        prisma.balance.upsert({
           where: { userId: paymentInformation.userId },
           update: { amount: { increment: paymentInformation.amount } },
           create: {
@@ -39,19 +39,19 @@ app.post("/hdfcWebhook", async (req, res) => {
             locked: 0,
           },
         }),
-        db.onRampTransaction.update({
+        prisma.onRampTransaction.update({
           where: { token: paymentInformation.token },
           data: { status: status === "SUCCESS" ? "Success" : "Failure" },
         }),
       ]);
 
-      console.log("✅ Balance:", balanceResult.amount);
-      console.log("✅ Transaction:", transactionResult.status);
+      console.log("Balance:", balanceResult.amount);
+      console.log("Transaction:", transactionResult.status);
     } else if (type === "BILL") {
-      const bill = await db.billSchedule.findUnique({ where: { token } });
+      const bill = await prisma.billSchedule.findUnique({ where: { token } });
       if (!bill) return res.status(404).json({ message: "Bill not found" });
 
-      await db.billSchedule.update({
+      await prisma.billSchedule.update({
         where: { token },
         data: { status: status === "SUCCESS" ? "PAID" : "OVERDUE" },
       });
@@ -59,9 +59,9 @@ app.post("/hdfcWebhook", async (req, res) => {
       if (status === "SUCCESS") {
         const userId = bill.userId;
 
-        // 2% cashback, max ₹100
+        // 2% cashback, max ₹10
         const cashback = BigInt(
-          Math.min(Math.floor((bill.amount * 2) / 100), 10000)
+          Math.min(Math.floor((bill.amount * 2) / 100), 10)
         );
         if (cashback > 0) {
           await awardReward(userId, "CASHBACK", cashback, {
@@ -70,11 +70,11 @@ app.post("/hdfcWebhook", async (req, res) => {
           });
         }
 
-        // Every 3rd bill → scratch card
-        const paidBills = await db.billSchedule.count({
+        // Every 20th bill → scratch card
+        const paidBills = await prisma.billSchedule.count({
           where: { userId, status: "PAID" },
         });
-        if (paidBills % 3 === 0) {
+        if (paidBills % 20 === 0) {
           await awardReward(userId, "SCRATCH", randomScratchCard(), {
             source: "bill_milestone",
             count: paidBills,
@@ -83,7 +83,7 @@ app.post("/hdfcWebhook", async (req, res) => {
 
         // First bill ever → referral bonus
         if (paidBills === 1) {
-          const referral = await db.referral.findFirst({
+          const referral = await prisma.referral.findFirst({
             where: { referredUserId: userId },
           });
           if (referral) {
@@ -105,7 +105,7 @@ app.post("/hdfcWebhook", async (req, res) => {
         }
       }
     } else if (type === "P2P") {
-      const transaction = await db.p2pTransfer.findUnique({
+      const transaction = await prisma.p2pTransfer.findUnique({
         where: { id: token },
       });
 
@@ -113,8 +113,8 @@ app.post("/hdfcWebhook", async (req, res) => {
         return res.status(404).json({ message: "P2P not found" });
 
       if (status === "SUCCESS") {
-        await db.$transaction([
-          db.balance.upsert({
+        await prisma.$transaction([
+          prisma.balance.upsert({
             where: { userId: transaction.toUserId! },
             update: { amount: { increment: transaction.amount } },
             create: {
@@ -123,16 +123,14 @@ app.post("/hdfcWebhook", async (req, res) => {
               locked: 0,
             },
           }),
-          db.p2pTransfer.update({
+          prisma.p2pTransfer.update({
             where: { id: transaction.id },
             data: { status: "SUCCESS" },
           }),
         ]);
       }
     } else if (type === "FREEZE") {
-      // Find the wrong-send request by the bank token stored on the wrongSendRequest record.
-      // (Querying transaction.bankToken failed because p2pTransfer doesn't have that field.)
-      const request = await db.wrongSendRequest.findFirst({
+      const request = await prisma.wrongSendRequest.findFirst({
         where: { txnId: Number(token) },
         include: {
           sender: { select: { id: true, name: true, number: true } },
@@ -174,7 +172,7 @@ app.post("/hdfcWebhook", async (req, res) => {
 
     res.json({ message: "Captured" });
   } catch (e) {
-    console.error("❌ Webhook error:", e);
+    console.error("Webhook error:", e);
     res.status(500).json({ message: "Processing failed" });
   }
 });
@@ -205,6 +203,7 @@ app.post("/webhook/upi-payment", async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 app.post("/webhook/qr-payment", async (req, res) => {
   const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET!;
   const receivedSignature = req.headers["x-razorpay-signature"] as string;
@@ -242,9 +241,7 @@ app.post("/webhook/qr-payment", async (req, res) => {
       const merchant = await prisma.merchant.findUnique({
         where: { id: payment.merchantId },
       });
-      // Add logic to update merchant balance or initiate payout if needed
-
-      // Trigger notification (e.g., via email or push notification)
+      // try to sent message instead this  - future
       console.log(
         `Payment of ₹${amount / 100} successful for merchant ${merchant?.name}`
       );
@@ -260,8 +257,8 @@ app.post("/webhook/qr-payment", async (req, res) => {
 });
 
 app.get("/health", (req, res) => {
-  res.status(200).json({ status: "ok" });
+  res.status(200).json({ status: "Calxsecure Webhook is running..." });
 });
 
 const PORT = process.env.PORT || 3002;
-app.listen(PORT, () => console.log(`Webhook backend running on port ${PORT}`));
+app.listen(PORT, () => console.log(`Calxsecure Webhook backend running on port ${PORT}`));
